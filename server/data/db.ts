@@ -1,0 +1,1120 @@
+import fs from 'fs';
+import path from 'path';
+import bcrypt from 'bcryptjs';
+
+const DATA_DIR = path.resolve(process.cwd(), 'data');
+const DB_FILE = path.resolve(DATA_DIR, 'db.json');
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  password: string; // hashed
+  phone: string;
+  role: 'customer' | 'admin';
+  addresses?: Array<{
+    firstName: string;
+    lastName: string;
+    address: string;
+    city: string;
+    country: string;
+    postalCode: string;
+    phone: string;
+    isDefault?: boolean;
+  }>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+  status: 'active' | 'inactive';
+  createdAt: string;
+}
+
+export interface ProductVariation {
+  id: string;
+  color: string;
+  size: string;
+  price: number;
+  stock: number;
+  sku: string;
+  image?: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  shortDescription: string;
+  category: string; // Category slug or name
+  fabric: string;
+  sku: string;
+  price: number;
+  salePrice?: number;
+  costPrice?: number;
+  images: string[];
+  colors: string[];
+  sizes: string[];
+  variations: ProductVariation[];
+  stock: number;
+  lowStockThreshold: number;
+  status: 'active' | 'draft' | 'archived';
+  featured: boolean;
+  seo: {
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords?: string[];
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrderItem {
+  productId: string;
+  productSlug: string;
+  name: string;
+  color?: string;
+  size?: string;
+  price: number;
+  quantity: number;
+  image: string;
+  sku: string;
+}
+
+export interface OrderNote {
+  id: string;
+  text: string;
+  date: string;
+  author: string;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string; // e.g. SK-2026-000101
+  userId?: string;
+  customerInfo: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  };
+  shippingAddress: {
+    address: string;
+    city: string;
+    country: string;
+    postalCode: string;
+  };
+  billingAddress?: {
+    address: string;
+    city: string;
+    country: string;
+    postalCode: string;
+  };
+  items: OrderItem[];
+  subtotal: number;
+  discount: number;
+  shipping: number;
+  total: number;
+  coupon?: {
+    code: string;
+    amount: number;
+  };
+  paymentMethod: string;
+  paymentStatus: 'Pending' | 'Paid' | 'Failed' | 'Refunded';
+  orderStatus: 'Pending Payment' | 'Processing' | 'Shipped' | 'Completed' | 'Cancelled' | 'Refunded';
+  trackingNumber?: string;
+  shippingCarrier?: string;
+  notes: OrderNote[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  discountType: 'percentage' | 'fixed';
+  amount: number;
+  minOrder: number;
+  maxDiscount?: number;
+  startDate: string;
+  expiryDate: string;
+  usageLimit: number;
+  usedCount: number;
+  active: boolean;
+}
+
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  status: 'unread' | 'read' | 'replied';
+  createdAt: string;
+}
+
+export interface StoreSettings {
+  brandName: string;
+  tagline: string;
+  logo: string;
+  phone: string;
+  whatsappNumber: string;
+  email: string;
+  address: string;
+  currency: string;
+  currencySymbol: string;
+  freeShippingThreshold: number;
+  standardShippingFee: number;
+  internationalShippingFee: number;
+  announcementText: string;
+  socialLinks: {
+    instagram: string;
+    facebook: string;
+    tiktok: string;
+    whatsapp: string;
+  };
+  bankDetails: {
+    bankName: string;
+    accountTitle: string;
+    accountNumber: string;
+    iban: string;
+    branchCode: string;
+  };
+  seoDefaults: {
+    title: string;
+    description: string;
+  };
+}
+
+export interface DatabaseSchema {
+  users: User[];
+  categories: Category[];
+  products: Product[];
+  orders: Order[];
+  coupons: Coupon[];
+  contactMessages: ContactMessage[];
+  settings: StoreSettings;
+}
+
+let dbMemory: DatabaseSchema | null = null;
+
+function ensureDataDir() {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+}
+
+export function getInitialSeedData(): DatabaseSchema {
+  const hashedPasswordAdmin = bcrypt.hashSync('admin123', 10);
+  const hashedPasswordCustomer = bcrypt.hashSync('customer123', 10);
+
+  const categories: Category[] = [
+    {
+      id: 'cat-balochi-dress',
+      name: 'Balochi Hand-Made Dresses',
+      slug: 'balochi-dress',
+      description: 'Authentic Quetta hand-embroidered Balochi Doch & Doz dresses crafted with heirloom needlework.',
+      image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=900&auto=format&fit=crop',
+      status: 'active',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 'cat-balochi-machine',
+      name: 'Balochi Machine Embroidery',
+      slug: 'balochi-machine',
+      description: 'Finely detailed Balochi machine embroidery suits on pure silk, lawn, and velvet fabrics.',
+      image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop',
+      status: 'active',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 'cat-new-arrivals',
+      name: 'New Arrivals',
+      slug: 'new-arrivals',
+      description: 'The latest seasonal pret and luxury formal arrivals for 2026.',
+      image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop',
+      status: 'active',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 'cat-formal-wear',
+      name: 'Formal Wear',
+      slug: 'formal-wear',
+      description: 'Opulent embroidered silhouettes crafted for weddings and formal festivities.',
+      image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=900&auto=format&fit=crop',
+      status: 'active',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 'cat-casual-wear',
+      name: 'Casual Wear',
+      slug: 'casual-wear',
+      description: 'Breezy luxury lawn and fine cotton suits tailored for effortless everyday chic.',
+      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop',
+      status: 'active',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 'cat-party-wear',
+      name: 'Party Wear',
+      slug: 'party-wear',
+      description: 'Contemporary party ensembles featuring organza dupattas and resham embroidery.',
+      image: 'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=900&auto=format&fit=crop',
+      status: 'active',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 'cat-bridal-couture',
+      name: 'Bridal Couture',
+      slug: 'bridal-couture',
+      description: 'Exquisite bridal wear, heirloom hand-embroidery, and regal silhouettes.',
+      image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=900&auto=format&fit=crop',
+      status: 'active',
+      createdAt: new Date().toISOString()
+    }
+  ];
+
+  const products: Product[] = [
+    {
+      id: 'prod-balochi-1',
+      name: 'New Green Balochi Dress - Handmade Traditional Doz',
+      slug: 'new-green-balochi-dress-handmade-traditional-doz',
+      shortDescription: 'Signature handmade Balochi dress in vibrant emerald with intricate Doch needlework and pocket embroidery.',
+      description: 'Handcrafted by master artisans in Quetta under the curation of Sami Khan. This exquisite Balochi dress features traditional geometric "Doch" needlework along the neckline, cuffs, and front pocket (pandol), woven with vibrant multicolored silk threads on premium grip silk fabric. Complete with coordinating embroidered dupatta and shalwar. Celebrated across Pakistan and internationally.',
+      category: 'balochi-dress',
+      fabric: 'Silk',
+      sku: 'SK-BLC-001',
+      price: 14500,
+      salePrice: 12900,
+      costPrice: 8500,
+      images: [
+        'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Emerald Green', 'Forest Olive'],
+      sizes: ['S', 'M', 'L', 'XL'],
+      variations: [
+        { id: 'vb1-1', color: 'Emerald Green', size: 'S', price: 12900, stock: 8, sku: 'SK-BLC-001-GRN-S' },
+        { id: 'vb1-2', color: 'Emerald Green', size: 'M', price: 12900, stock: 15, sku: 'SK-BLC-001-GRN-M' },
+        { id: 'vb1-3', color: 'Emerald Green', size: 'L', price: 12900, stock: 10, sku: 'SK-BLC-001-GRN-L' }
+      ],
+      stock: 33,
+      lowStockThreshold: 5,
+      status: 'active',
+      featured: true,
+      seo: {
+        metaTitle: 'New Green Balochi Dress Handmade Traditional Doz | SK Brand Sami Khan',
+        metaDescription: 'Authentic handcrafted green Balochi dress with traditional Doch needlework from Sami Khan Quetta.'
+      },
+      createdAt: '2026-03-15T10:00:00.000Z',
+      updatedAt: '2026-03-15T10:00:00.000Z'
+    },
+    {
+      id: 'prod-balochi-2',
+      name: 'Balochi Dress by SK Brand Sami Khan - Crimson Doz',
+      slug: 'balochi-dress-by-sk-brand-sami-khan-crimson-doz',
+      shortDescription: 'Regal crimson Balochi handmade dress adorned with traditional mirror-work and heavy pocket Doch.',
+      description: 'Exclusive creation from SK Brand Sami Khan (Liaqat Bazaar, Quetta). Elaborate hand-stitched Balochi embroidery featuring delicate mirrors and antique golden resham threadwork across the collar, daman, and expansive front pocket. Premium pure cotton silk fabric with comfortable drape.',
+      category: 'balochi-dress',
+      fabric: 'Cotton',
+      sku: 'SK-BLC-002',
+      price: 16800,
+      salePrice: 14500,
+      costPrice: 9500,
+      images: [
+        'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Ruby Crimson', 'Deep Maroon'],
+      sizes: ['S', 'M', 'L'],
+      variations: [
+        { id: 'vb2-1', color: 'Ruby Crimson', size: 'S', price: 14500, stock: 6, sku: 'SK-BLC-002-CRM-S' },
+        { id: 'vb2-2', color: 'Ruby Crimson', size: 'M', price: 14500, stock: 12, sku: 'SK-BLC-002-CRM-M' }
+      ],
+      stock: 18,
+      lowStockThreshold: 4,
+      status: 'active',
+      featured: true,
+      seo: {
+        metaTitle: 'Balochi Dress by SK Brand Sami Khan Crimson Doz | Quetta',
+        metaDescription: 'Handmade crimson Balochi dress with traditional mirror embroidery by Sami Khan Quetta.'
+      },
+      createdAt: '2026-03-16T10:00:00.000Z',
+      updatedAt: '2026-03-16T10:00:00.000Z'
+    },
+    {
+      id: 'prod-balochi-3',
+      name: 'New Balochi Suit 2026 Multiple Designs - Quetta Edition',
+      slug: 'new-balochi-suit-2026-multiple-designs-quetta-edition',
+      shortDescription: 'Modern festive Balochi suit featuring high-definition machine embroidery and vibrant border patti.',
+      description: 'The 2026 flagship edition from Naseem Fashion Mall, Liaqat Bazaar Quetta. Blending traditional Balochi aesthetic motifs with modern tailoring. Features dense Balochi machine embroidery across the neckline and cuffs on soft lawn fabric, paired with an embroidered chiffon dupatta.',
+      category: 'balochi-machine',
+      fabric: 'Lawn',
+      sku: 'SK-BLC-003',
+      price: 11500,
+      salePrice: 9900,
+      costPrice: 6200,
+      images: [
+        'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Midnight Blue', 'Teal Blossom'],
+      sizes: ['S', 'M', 'L', 'XL'],
+      variations: [
+        { id: 'vb3-1', color: 'Midnight Blue', size: 'S', price: 9900, stock: 14, sku: 'SK-BLC-003-BLU-S' },
+        { id: 'vb3-2', color: 'Midnight Blue', size: 'M', price: 9900, stock: 20, sku: 'SK-BLC-003-BLU-M' }
+      ],
+      stock: 42,
+      lowStockThreshold: 8,
+      status: 'active',
+      featured: true,
+      seo: {
+        metaTitle: 'New Balochi Suit 2026 Multiple Designs | SK Brand Sami Khan',
+        metaDescription: 'Multiple designs Balochi suits from SK Brand Sami Khan Liaqat Bazaar Quetta.'
+      },
+      createdAt: '2026-03-17T10:00:00.000Z',
+      updatedAt: '2026-03-17T10:00:00.000Z'
+    },
+    {
+      id: 'prod-balochi-4',
+      name: 'Exploring Hand-Made Balochi Doch 3Pc Ensemble - Noir Gold',
+      slug: 'exploring-hand-made-balochi-doch-3pc-ensemble-noir-gold',
+      shortDescription: 'Hand-made black velvet Balochi doch dress with antique gold tilla and threadwork.',
+      description: 'Artisanal masterpiece showcasing the centuries-old Balochi Doch tradition. Black luxury velvet embellished with intricate geometric patterns handcrafted over months by Quetta artisans. A Sami Khan signature design.',
+      category: 'balochi-dress',
+      fabric: 'Velvet',
+      sku: 'SK-BLC-004',
+      price: 18500,
+      salePrice: 16200,
+      costPrice: 11000,
+      images: [
+        'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Jet Black', 'Antique Gold'],
+      sizes: ['S', 'M', 'L'],
+      variations: [
+        { id: 'vb4-1', color: 'Jet Black', size: 'M', price: 16200, stock: 9, sku: 'SK-BLC-004-BLK-M' }
+      ],
+      stock: 15,
+      lowStockThreshold: 4,
+      status: 'active',
+      featured: true,
+      seo: {
+        metaTitle: 'Hand-Made Balochi Doch 3Pc Ensemble Noir Gold | Sami Khan',
+        metaDescription: 'Luxury black velvet handmade Balochi doch dress by SK Brand Sami Khan Quetta.'
+      },
+      createdAt: '2026-03-18T10:00:00.000Z',
+      updatedAt: '2026-03-18T10:00:00.000Z'
+    },
+    {
+      id: 'prod-1',
+      name: '3Pc Embroidered Chiffon Suit - Royal Crimson',
+      slug: '3pc-embroidered-chiffon-suit-royal-crimson',
+      shortDescription: 'Regal chiffon ensemble featuring intricate zardozi and resham embroidery with dyed silk trouser.',
+      description: 'A masterpiece of Pakistani festive craftsmanship. This 3-piece luxury chiffon suit features an intensely hand-embellished front with metallic threadwork, sequins, and pearls. Complemented with a diaphanous pure chiffon dupatta framed with embroidered scallop borders and coordinating raw silk trousers. Perfect for weddings, Eid celebrations, and evening galas.',
+      category: 'formal-wear',
+      fabric: 'Chiffon',
+      sku: 'SK-CHF-001',
+      price: 6850,
+      salePrice: 5950,
+      costPrice: 3800,
+      images: [
+        'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Deep Crimson', 'Ruby Wine'],
+      sizes: ['S', 'M', 'L', 'XL'],
+      variations: [
+        { id: 'v1-1', color: 'Deep Crimson', size: 'S', price: 5950, stock: 12, sku: 'SK-CHF-001-CRM-S' },
+        { id: 'v1-2', color: 'Deep Crimson', size: 'M', price: 5950, stock: 18, sku: 'SK-CHF-001-CRM-M' },
+        { id: 'v1-3', color: 'Deep Crimson', size: 'L', price: 5950, stock: 14, sku: 'SK-CHF-001-CRM-L' },
+        { id: 'v1-4', color: 'Deep Crimson', size: 'XL', price: 5950, stock: 6, sku: 'SK-CHF-001-CRM-XL' },
+      ],
+      stock: 50,
+      lowStockThreshold: 10,
+      status: 'active',
+      featured: true,
+      seo: {
+        metaTitle: '3Pc Embroidered Chiffon Suit Royal Crimson | SK Brands',
+        metaDescription: 'Shop our signature 3Pc embroidered chiffon suit featuring royal crimson threadwork and delicate organza trims.'
+      },
+      createdAt: '2026-03-01T10:00:00.000Z',
+      updatedAt: '2026-03-01T10:00:00.000Z'
+    },
+    {
+      id: 'prod-2',
+      name: '3Pc Hand-Embroidered Organza Maxi - Champagne Gold',
+      slug: '3pc-hand-embroidered-organza-maxi-champagne-gold',
+      shortDescription: 'Luminous organza floor-length maxi adorned with tilla needlework and hand-cut lace detailing.',
+      description: 'Drape yourself in understated opulence. This stunning organza maxi is engineered with flared panels encrusted with dabka and kora craftsmanship. Includes an embellished organza dupatta with four-sided kiran trim and an inner slip in pure grip silk.',
+      category: 'party-wear',
+      fabric: 'Organza',
+      sku: 'SK-ORG-002',
+      price: 12500,
+      salePrice: 10950,
+      costPrice: 7200,
+      images: [
+        'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Champagne Gold', 'Ivory'],
+      sizes: ['S', 'M', 'L'],
+      variations: [
+        { id: 'v2-1', color: 'Champagne Gold', size: 'S', price: 10950, stock: 8, sku: 'SK-ORG-002-GLD-S' },
+        { id: 'v2-2', color: 'Champagne Gold', size: 'M', price: 10950, stock: 10, sku: 'SK-ORG-002-GLD-M' },
+        { id: 'v2-3', color: 'Champagne Gold', size: 'L', price: 10950, stock: 5, sku: 'SK-ORG-002-GLD-L' },
+      ],
+      stock: 23,
+      lowStockThreshold: 5,
+      status: 'active',
+      featured: true,
+      seo: {
+        metaTitle: 'Hand-Embroidered Organza Maxi - Champagne Gold | SK Brands',
+        metaDescription: 'Luxury Champagne Gold organza maxi with intricate hand embroidery and pure grip lining.'
+      },
+      createdAt: '2026-03-02T10:00:00.000Z',
+      updatedAt: '2026-03-02T10:00:00.000Z'
+    },
+    {
+      id: 'prod-3',
+      name: '3Pc Pure Velvet Un-Stitch Suit - Midnight Sapphire',
+      slug: '3pc-pure-velvet-un-stitch-suit-midnight-sapphire',
+      shortDescription: 'Plush micro-velvet shirt and dupatta with antique gold zari work and raw silk trousers.',
+      description: 'Crafted from premium 9000 micro velvet, this winter royal collection suit exudes rich luster and soft handfeel. Features heavy neckline embroidery, daman border extensions, and an opulent digital foil-printed velvet shawl.',
+      category: 'formal-wear',
+      fabric: 'Velvet',
+      sku: 'SK-VLV-003',
+      price: 9500,
+      costPrice: 6000,
+      images: [
+        'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Midnight Sapphire', 'Emerald Green'],
+      sizes: ['Unstitched', 'S', 'M', 'L'],
+      variations: [
+        { id: 'v3-1', color: 'Midnight Sapphire', size: 'Unstitched', price: 9500, stock: 25, sku: 'SK-VLV-003-UNST' },
+        { id: 'v3-2', color: 'Midnight Sapphire', size: 'M', price: 11000, stock: 8, sku: 'SK-VLV-003-ST-M' }
+      ],
+      stock: 33,
+      lowStockThreshold: 8,
+      status: 'active',
+      featured: true,
+      seo: {
+        metaTitle: 'Pure Velvet Un-Stitch Suit Midnight Sapphire | SK Brands',
+        metaDescription: 'Shop micro velvet unstitched suit with gold zari embroidery and velvet shawl.'
+      },
+      createdAt: '2026-03-03T10:00:00.000Z',
+      updatedAt: '2026-03-03T10:00:00.000Z'
+    },
+    {
+      id: 'prod-4',
+      name: 'Printed Lawn 3 Piece Festive Pret - Pastel Mint',
+      slug: 'printed-lawn-3-piece-festive-pret-pastel-mint',
+      shortDescription: 'Breathable 80/80 luxury lawn digital printed shirt, chiffon dupatta, and cambric trousers.',
+      description: 'A breath of fresh seasonal elegance. Fine combed cotton lawn infused with serene pastel floral motifs, enhanced with Schiffli lace inserts on the cuffs and hemline. Finished with a feather-light printed bamberg chiffon dupatta.',
+      category: 'casual-wear',
+      fabric: 'Lawn',
+      sku: 'SK-LWN-004',
+      price: 4250,
+      salePrice: 3850,
+      costPrice: 2400,
+      images: [
+        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Pastel Mint', 'Peach Blossom'],
+      sizes: ['XS', 'S', 'M', 'L', 'XL'],
+      variations: [
+        { id: 'v4-1', color: 'Pastel Mint', size: 'XS', price: 3850, stock: 10, sku: 'SK-LWN-004-XS' },
+        { id: 'v4-2', color: 'Pastel Mint', size: 'S', price: 3850, stock: 15, sku: 'SK-LWN-004-S' },
+        { id: 'v4-3', color: 'Pastel Mint', size: 'M', price: 3850, stock: 20, sku: 'SK-LWN-004-M' },
+        { id: 'v4-4', color: 'Pastel Mint', size: 'L', price: 3850, stock: 12, sku: 'SK-LWN-004-L' }
+      ],
+      stock: 57,
+      lowStockThreshold: 15,
+      status: 'active',
+      featured: true,
+      seo: {
+        metaTitle: 'Printed Lawn 3 Piece Festive Pret Pastel Mint | SK Brands',
+        metaDescription: 'Breezy luxury lawn pret suit with digital floral prints and chiffon dupatta.'
+      },
+      createdAt: '2026-03-04T10:00:00.000Z',
+      updatedAt: '2026-03-04T10:00:00.000Z'
+    },
+    {
+      id: 'prod-5',
+      name: '3Pc Embroidered Cotton Silk Ensemble - Ivory Blush',
+      slug: '3pc-embroidered-cotton-silk-ensemble-ivory-blush',
+      shortDescription: 'Timeless ivory cotton-silk shirt with subtle tonal resham work, organza border and jacquard dupatta.',
+      description: 'Sophistication redefined for intimate gatherings and formal dinners. Featuring a tailored round neckline with pearl hangings, sleeves highlighted with cutwork borders, and an intricately woven golden jacquard dupatta.',
+      category: 'luxury-pret',
+      fabric: 'Cotton',
+      sku: 'SK-CTN-005',
+      price: 5450,
+      costPrice: 3200,
+      images: [
+        'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Ivory', 'Blush Pink'],
+      sizes: ['S', 'M', 'L', 'XL'],
+      variations: [
+        { id: 'v5-1', color: 'Ivory', size: 'S', price: 5450, stock: 9, sku: 'SK-CTN-005-IVR-S' },
+        { id: 'v5-2', color: 'Ivory', size: 'M', price: 5450, stock: 14, sku: 'SK-CTN-005-IVR-M' },
+        { id: 'v5-3', color: 'Ivory', size: 'L', price: 5450, stock: 11, sku: 'SK-CTN-005-IVR-L' }
+      ],
+      stock: 34,
+      lowStockThreshold: 10,
+      status: 'active',
+      featured: true,
+      seo: {
+        metaTitle: 'Embroidered Cotton Silk Ensemble Ivory Blush | SK Brands',
+        metaDescription: 'Buy luxury ivory cotton silk 3pc suit with intricate pearl embellishments.'
+      },
+      createdAt: '2026-03-05T10:00:00.000Z',
+      updatedAt: '2026-03-05T10:00:00.000Z'
+    },
+    {
+      id: 'prod-6',
+      name: 'Bridal Organza Pishwas & Dupatta - Rose Gold',
+      slug: 'bridal-organza-pishwas-dupatta-rose-gold',
+      shortDescription: 'Regal bridal 16-kali flared pishwas woven with rose gold metallic wire and semi-precious stones.',
+      description: 'An heirloom creation designed for the modern Pakistani bride. Features a grand 180-inch flair pishwas adorned with traditional marori and gota work. Accompanied by a heavy mathapatti-bordered organza dupatta and churidar pajama.',
+      category: 'bridal-couture',
+      fabric: 'Organza',
+      sku: 'SK-BDL-006',
+      price: 18500,
+      salePrice: 16500,
+      costPrice: 11000,
+      images: [
+        'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Rose Gold', 'Pale Gold'],
+      sizes: ['S', 'M', 'L'],
+      variations: [
+        { id: 'v6-1', color: 'Rose Gold', size: 'S', price: 16500, stock: 4, sku: 'SK-BDL-006-S' },
+        { id: 'v6-2', color: 'Rose Gold', size: 'M', price: 16500, stock: 6, sku: 'SK-BDL-006-M' }
+      ],
+      stock: 10,
+      lowStockThreshold: 3,
+      status: 'active',
+      featured: true,
+      seo: {
+        metaTitle: 'Bridal Organza Pishwas & Dupatta Rose Gold | SK Brands',
+        metaDescription: 'Handcrafted Pakistani bridal pishwas in luminous rose gold organza with intricate gota work.'
+      },
+      createdAt: '2026-03-06T10:00:00.000Z',
+      updatedAt: '2026-03-06T10:00:00.000Z'
+    },
+    {
+      id: 'prod-7',
+      name: 'Luxury Chiffon Formal - Noir Elegance',
+      slug: 'luxury-chiffon-formal-noir-elegance',
+      shortDescription: 'Stunning jet-black chiffon suit with silver tilla, sequins, and embroidered raw silk culottes.',
+      description: 'Dazzle in timeless black. Noir Elegance pairs intricate silver resham filigree with shimmering light-catching sequins over premium georgette chiffon. The statement dupatta features embroidered borders on all four sides.',
+      category: 'formal-wear',
+      fabric: 'Chiffon',
+      sku: 'SK-CHF-007',
+      price: 7200,
+      salePrice: 6400,
+      costPrice: 4100,
+      images: [
+        'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Jet Black', 'Charcoal'],
+      sizes: ['S', 'M', 'L', 'XL'],
+      variations: [
+        { id: 'v7-1', color: 'Jet Black', size: 'S', price: 6400, stock: 7, sku: 'SK-CHF-007-BLK-S' },
+        { id: 'v7-2', color: 'Jet Black', size: 'M', price: 6400, stock: 15, sku: 'SK-CHF-007-BLK-M' },
+        { id: 'v7-3', color: 'Jet Black', size: 'L', price: 6400, stock: 10, sku: 'SK-CHF-007-BLK-L' }
+      ],
+      stock: 32,
+      lowStockThreshold: 8,
+      status: 'active',
+      featured: true,
+      seo: {
+        metaTitle: 'Luxury Chiffon Formal Noir Elegance | SK Brands',
+        metaDescription: 'Black embroidered chiffon formal suit with silver tilla work and raw silk trousers.'
+      },
+      createdAt: '2026-03-07T10:00:00.000Z',
+      updatedAt: '2026-03-07T10:00:00.000Z'
+    },
+    {
+      id: 'prod-8',
+      name: 'Embroidered Lawn Summer Pret - Coral Sunset',
+      slug: 'embroidered-lawn-summer-pret-coral-sunset',
+      shortDescription: 'Vibrant coral lawn kurta with white cross-stitch neckline embroidery and printed lawn dupatta.',
+      description: 'Energize your summer wardrobe with this lively coral ensemble. Soft, breathable high-count lawn adorned with clean geometry embroidery and paired with straight cigarette pants.',
+      category: 'casual-wear',
+      fabric: 'Lawn',
+      sku: 'SK-LWN-008',
+      price: 4800,
+      costPrice: 2800,
+      images: [
+        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Coral Sunset', 'Tangerine'],
+      sizes: ['XS', 'S', 'M', 'L'],
+      variations: [
+        { id: 'v8-1', color: 'Coral Sunset', size: 'S', price: 4800, stock: 11, sku: 'SK-LWN-008-CRL-S' },
+        { id: 'v8-2', color: 'Coral Sunset', size: 'M', price: 4800, stock: 16, sku: 'SK-LWN-008-CRL-M' },
+        { id: 'v8-3', color: 'Coral Sunset', size: 'L', price: 4800, stock: 8, sku: 'SK-LWN-008-CRL-L' }
+      ],
+      stock: 35,
+      lowStockThreshold: 10,
+      status: 'active',
+      featured: true,
+      seo: {
+        metaTitle: 'Embroidered Lawn Summer Pret Coral Sunset | SK Brands',
+        metaDescription: 'Shop coral embroidered lawn summer pret with breathable lawn fabric and dyed trousers.'
+      },
+      createdAt: '2026-03-08T10:00:00.000Z',
+      updatedAt: '2026-03-08T10:00:00.000Z'
+    },
+    {
+      id: 'prod-9',
+      name: '3Pc Raw Silk Festive Formal - Emerald Forest',
+      slug: '3pc-raw-silk-festive-formal-emerald-forest',
+      shortDescription: 'Pure Korean raw silk kurta with resham jaal embroidery and tissue organza dupatta.',
+      description: 'Lustrous emerald green raw silk shirt highlighted with artisanal antique zari motifs and hand-set seed pearls. Paired with a contrast tissue silk dupatta and matching straight cigarette trousers.',
+      category: 'formal-wear',
+      fabric: 'Silk',
+      sku: 'SK-SLK-009',
+      price: 8900,
+      costPrice: 5200,
+      images: [
+        'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Emerald Green', 'Forest Olive'],
+      sizes: ['S', 'M', 'L'],
+      variations: [
+        { id: 'v9-1', color: 'Emerald Green', size: 'S', price: 8900, stock: 6, sku: 'SK-SLK-009-EMR-S' },
+        { id: 'v9-2', color: 'Emerald Green', size: 'M', price: 8900, stock: 8, sku: 'SK-SLK-009-EMR-M' }
+      ],
+      stock: 14,
+      lowStockThreshold: 5,
+      status: 'active',
+      featured: false,
+      seo: {
+        metaTitle: '3Pc Raw Silk Festive Formal Emerald Forest | SK Brands',
+        metaDescription: 'Raw silk formal ensemble in majestic emerald green with handcrafted zari borders.'
+      },
+      createdAt: '2026-03-09T10:00:00.000Z',
+      updatedAt: '2026-03-09T10:00:00.000Z'
+    },
+    {
+      id: 'prod-10',
+      name: 'Handcrafted Velvet Shawl & Suit - Burgundy Jewel',
+      slug: 'handcrafted-velvet-shawl-suit-burgundy-jewel',
+      shortDescription: 'Heavily embroidered velvet shawl with matching raw silk 2-piece solid unstitched suit.',
+      description: 'The epitome of Pakistani winter royalty. Features an expansive 2.75 meter velvet shawl bordered with traditional tilla embroidery and resham flowers. Includes coordinating silk shirt and trouser fabric.',
+      category: 'formal-wear',
+      fabric: 'Velvet',
+      sku: 'SK-VLV-010',
+      price: 11200,
+      salePrice: 9900,
+      costPrice: 6500,
+      images: [
+        'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Burgundy', 'Wine Red'],
+      sizes: ['Unstitched', 'Standard'],
+      variations: [
+        { id: 'v10-1', color: 'Burgundy', size: 'Unstitched', price: 9900, stock: 15, sku: 'SK-VLV-010-UNST' }
+      ],
+      stock: 15,
+      lowStockThreshold: 4,
+      status: 'active',
+      featured: false,
+      seo: {
+        metaTitle: 'Handcrafted Velvet Shawl & Suit Burgundy Jewel | SK Brands',
+        metaDescription: 'Rich burgundy velvet shawl set with tilla embroidery and unstitched raw silk suit.'
+      },
+      createdAt: '2026-03-10T10:00:00.000Z',
+      updatedAt: '2026-03-10T10:00:00.000Z'
+    },
+    {
+      id: 'prod-11',
+      name: 'Luxury Lawn 3Pc Unstitched - Azure Bloom',
+      slug: 'luxury-lawn-3pc-unstitched-azure-bloom',
+      shortDescription: 'Unstitched embroidered lawn shirt with printed chiffon dupatta and solid dyed cambric trouser.',
+      description: 'Intricately patterned floral lawn featuring an embroidered neckline patch, sleeve lace borders, and a vibrant lightweight printed chiffon dupatta.',
+      category: 'casual-wear',
+      fabric: 'Lawn',
+      sku: 'SK-LWN-011',
+      price: 4500,
+      costPrice: 2600,
+      images: [
+        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Sky Blue', 'Azure'],
+      sizes: ['Unstitched'],
+      variations: [
+        { id: 'v11-1', color: 'Sky Blue', size: 'Unstitched', price: 4500, stock: 28, sku: 'SK-LWN-011-UNST' }
+      ],
+      stock: 28,
+      lowStockThreshold: 8,
+      status: 'active',
+      featured: false,
+      seo: {
+        metaTitle: 'Luxury Lawn 3Pc Unstitched Azure Bloom | SK Brands',
+        metaDescription: 'Classic Azure Bloom unstitched Pakistani 3-piece lawn suit.'
+      },
+      createdAt: '2026-03-11T10:00:00.000Z',
+      updatedAt: '2026-03-11T10:00:00.000Z'
+    },
+    {
+      id: 'prod-12',
+      name: 'Party Wear Georgette Chiffon - Lilac Blossom',
+      slug: 'party-wear-georgette-chiffon-lilac-blossom',
+      shortDescription: 'Stitched lilac pret suit with hand-touched cutwork daman, organza lace, and foil dupatta.',
+      description: 'Chic, modern party silhouette featuring subtle silver sequins, thread embroidery along the neckline, and an organza dupatta sprinkled with foil accents.',
+      category: 'party-wear',
+      fabric: 'Chiffon',
+      sku: 'SK-CHF-012',
+      price: 6200,
+      costPrice: 3800,
+      images: [
+        'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=900&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=900&auto=format&fit=crop'
+      ],
+      colors: ['Lilac', 'Lavender'],
+      sizes: ['S', 'M', 'L'],
+      variations: [
+        { id: 'v12-1', color: 'Lilac', size: 'S', price: 6200, stock: 8, sku: 'SK-CHF-012-LLC-S' },
+        { id: 'v12-2', color: 'Lilac', size: 'M', price: 6200, stock: 12, sku: 'SK-CHF-012-LLC-M' },
+        { id: 'v12-3', color: 'Lilac', size: 'L', price: 6200, stock: 6, sku: 'SK-CHF-012-LLC-L' }
+      ],
+      stock: 26,
+      lowStockThreshold: 6,
+      status: 'active',
+      featured: false,
+      seo: {
+        metaTitle: 'Party Wear Georgette Chiffon Lilac Blossom | SK Brands',
+        metaDescription: 'Lilac festive chiffon pret suit for parties and family gatherings.'
+      },
+      createdAt: '2026-03-12T10:00:00.000Z',
+      updatedAt: '2026-03-12T10:00:00.000Z'
+    }
+  ];
+
+  const coupons: Coupon[] = [
+    {
+      id: 'c-welcome10',
+      code: 'WELCOME10',
+      discountType: 'percentage',
+      amount: 10,
+      minOrder: 3000,
+      maxDiscount: 1500,
+      startDate: '2026-01-01T00:00:00.000Z',
+      expiryDate: '2026-12-31T23:59:59.000Z',
+      usageLimit: 500,
+      usedCount: 28,
+      active: true
+    },
+    {
+      id: 'c-eid20',
+      code: 'EID20',
+      discountType: 'percentage',
+      amount: 20,
+      minOrder: 8000,
+      maxDiscount: 2500,
+      startDate: '2026-01-01T00:00:00.000Z',
+      expiryDate: '2026-12-31T23:59:59.000Z',
+      usageLimit: 200,
+      usedCount: 42,
+      active: true
+    },
+    {
+      id: 'c-skbrands15',
+      code: 'SKBRANDS15',
+      discountType: 'percentage',
+      amount: 15,
+      minOrder: 5000,
+      maxDiscount: 2000,
+      startDate: '2026-01-01T00:00:00.000Z',
+      expiryDate: '2026-12-31T23:59:59.000Z',
+      usageLimit: 300,
+      usedCount: 15,
+      active: true
+    }
+  ];
+
+  const users: User[] = [
+    {
+      id: 'user-admin',
+      name: 'SK Brands Admin',
+      email: 'admin@skbrands.com',
+      password: hashedPasswordAdmin,
+      phone: '+923001234567',
+      role: 'admin',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z'
+    },
+    {
+      id: 'user-customer-1',
+      name: 'Ayesha Malik',
+      email: 'ayesha.malik@example.com',
+      password: hashedPasswordCustomer,
+      phone: '+447700900123',
+      role: 'customer',
+      addresses: [
+        {
+          firstName: 'Ayesha',
+          lastName: 'Malik',
+          address: '42 Kensington High Street, Apt 3B',
+          city: 'London',
+          country: 'United Kingdom',
+          postalCode: 'W8 4SG',
+          phone: '+447700900123',
+          isDefault: true
+        }
+      ],
+      createdAt: '2026-02-10T12:00:00.000Z',
+      updatedAt: '2026-02-10T12:00:00.000Z'
+    },
+    {
+      id: 'user-customer-2',
+      name: 'Fatima Zahra',
+      email: 'fatima.zahra@example.com',
+      password: hashedPasswordCustomer,
+      phone: '+923214567890',
+      role: 'customer',
+      addresses: [
+        {
+          firstName: 'Fatima',
+          lastName: 'Zahra',
+          address: 'House 88, Street 14, F-7/2',
+          city: 'Islamabad',
+          country: 'Pakistan',
+          postalCode: '44000',
+          phone: '+923214567890',
+          isDefault: true
+        }
+      ],
+      createdAt: '2026-02-15T15:30:00.000Z',
+      updatedAt: '2026-02-15T15:30:00.000Z'
+    }
+  ];
+
+  const orders: Order[] = [
+    {
+      id: 'ord-101',
+      orderNumber: 'SK-2026-000101',
+      userId: 'user-customer-1',
+      customerInfo: {
+        firstName: 'Ayesha',
+        lastName: 'Malik',
+        email: 'ayesha.malik@example.com',
+        phone: '+447700900123'
+      },
+      shippingAddress: {
+        address: '42 Kensington High Street, Apt 3B',
+        city: 'London',
+        country: 'United Kingdom',
+        postalCode: 'W8 4SG'
+      },
+      items: [
+        {
+          productId: 'prod-1',
+          productSlug: '3pc-embroidered-chiffon-suit-royal-crimson',
+          name: '3Pc Embroidered Chiffon Suit - Royal Crimson',
+          color: 'Deep Crimson',
+          size: 'M',
+          price: 5950,
+          quantity: 1,
+          image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=900&auto=format&fit=crop',
+          sku: 'SK-CHF-001-CRM-M'
+        },
+        {
+          productId: 'prod-4',
+          productSlug: 'printed-lawn-3-piece-festive-pret-pastel-mint',
+          name: 'Printed Lawn 3 Piece Festive Pret - Pastel Mint',
+          color: 'Pastel Mint',
+          size: 'M',
+          price: 3850,
+          quantity: 1,
+          image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop',
+          sku: 'SK-LWN-004-M'
+        }
+      ],
+      subtotal: 9800,
+      discount: 980,
+      shipping: 0, // Free international above threshold
+      total: 8820,
+      coupon: {
+        code: 'WELCOME10',
+        amount: 980
+      },
+      paymentMethod: 'Manual Payment (WhatsApp Invoice / Card Link)',
+      paymentStatus: 'Paid',
+      orderStatus: 'Shipped',
+      trackingNumber: 'DHL-UK-9842109',
+      shippingCarrier: 'DHL Express Worldwide',
+      notes: [
+        {
+          id: 'note-1',
+          text: 'Payment received via payment link invoice. Verified by finance.',
+          date: '2026-02-12T10:00:00.000Z',
+          author: 'Admin'
+        },
+        {
+          id: 'note-2',
+          text: 'Dispatched via DHL Express. Tracking sent to customer email & WhatsApp.',
+          date: '2026-02-13T14:30:00.000Z',
+          author: 'Admin'
+        }
+      ],
+      createdAt: '2026-02-11T16:20:00.000Z',
+      updatedAt: '2026-02-13T14:30:00.000Z'
+    },
+    {
+      id: 'ord-102',
+      orderNumber: 'SK-2026-000102',
+      userId: 'user-customer-2',
+      customerInfo: {
+        firstName: 'Fatima',
+        lastName: 'Zahra',
+        email: 'fatima.zahra@example.com',
+        phone: '+923214567890'
+      },
+      shippingAddress: {
+        address: 'House 88, Street 14, F-7/2',
+        city: 'Islamabad',
+        country: 'Pakistan',
+        postalCode: '44000'
+      },
+      items: [
+        {
+          productId: 'prod-2',
+          productSlug: '3pc-hand-embroidered-organza-maxi-champagne-gold',
+          name: '3Pc Hand-Embroidered Organza Maxi - Champagne Gold',
+          color: 'Champagne Gold',
+          size: 'M',
+          price: 10950,
+          quantity: 1,
+          image: 'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=900&auto=format&fit=crop',
+          sku: 'SK-ORG-002-GLD-M'
+        }
+      ],
+      subtotal: 10950,
+      discount: 0,
+      shipping: 0,
+      total: 10950,
+      paymentMethod: 'Bank Transfer (Meezan Bank)',
+      paymentStatus: 'Pending',
+      orderStatus: 'Pending Payment',
+      notes: [
+        {
+          id: 'note-102-1',
+          text: 'Order received. WhatsApp message sent with Meezan Bank transfer details.',
+          date: '2026-03-01T09:15:00.000Z',
+          author: 'System'
+        }
+      ],
+      createdAt: '2026-03-01T09:10:00.000Z',
+      updatedAt: '2026-03-01T09:15:00.000Z'
+    }
+  ];
+
+  const contactMessages: ContactMessage[] = [
+    {
+      id: 'msg-1',
+      name: 'Mariam Siddiqui',
+      email: 'mariam.s@example.com',
+      phone: '+971501234567',
+      message: 'Hi SK Brands, do you deliver custom tailored bridal sizes to Dubai within 10 days?',
+      status: 'unread',
+      createdAt: '2026-03-02T14:00:00.000Z'
+    }
+  ];
+
+  const settings: StoreSettings = {
+    brandName: 'SK Brand Sami khan',
+    tagline: 'Hand Made Balochi Dresses & Luxury Embroidery • Liaqat Bazaar Quetta',
+    logo: '/sk-brand-logo.svg',
+    phone: '0314 0003801',
+    whatsappNumber: '+923160367456',
+    email: 'samikhan@skbrand.pk',
+    address: 'Bazaar, Liaqat Bazaar Naseem Fashion Mall Sk Brand, Shara Liaqat, Quetta, 87300, Pakistan',
+    currency: 'PKR',
+    currencySymbol: 'Rs.',
+    freeShippingThreshold: 10000,
+    standardShippingFee: 350,
+    internationalShippingFee: 3500,
+    announcementText: 'SK Brand Sami Khan • Hand Made Balochi Dresses • Liaqat Bazaar Quetta • WhatsApp: 0316 0367456',
+    socialLinks: {
+      instagram: 'https://instagram.com/skbrandsamikhan',
+      facebook: 'https://facebook.com/skbrandsamikhan',
+      tiktok: 'https://tiktok.com/@skbrand_samikhan',
+      whatsapp: 'https://wa.me/923160367456'
+    },
+    bankDetails: {
+      bankName: 'Meezan Bank Limited (Liaqat Bazaar Quetta Branch)',
+      accountTitle: 'SK Brand Sami Khan',
+      accountNumber: '02100109845678',
+      iban: 'PK45MEZN0002100109845678',
+      branchCode: '0210 - Liaqat Bazaar Quetta'
+    },
+    seoDefaults: {
+      title: 'SK Brand Sami khan | Hand Made Balochi Dresses & Luxury Pret | Quetta',
+      description: 'Official online store for SK Brand Sami khan (Liaqat Bazaar Quetta). Authentic hand-made Balochi dresses, handmade embroidery dresses, Balochi machine embroidery suits, and worldwide delivery.'
+    }
+  };
+
+  return {
+    users,
+    categories,
+    products,
+    orders,
+    coupons,
+    contactMessages,
+    settings
+  };
+}
+
+export function readDb(): DatabaseSchema {
+  if (dbMemory) {
+    return dbMemory;
+  }
+  ensureDataDir();
+  if (!fs.existsSync(DB_FILE)) {
+    const seed = getInitialSeedData();
+    fs.writeFileSync(DB_FILE, JSON.stringify(seed, null, 2), 'utf-8');
+    dbMemory = seed;
+    return seed;
+  }
+  try {
+    const raw = fs.readFileSync(DB_FILE, 'utf-8');
+    dbMemory = JSON.parse(raw);
+    return dbMemory!;
+  } catch (err) {
+    console.error('Error reading db.json, recreating with initial seed', err);
+    const seed = getInitialSeedData();
+    fs.writeFileSync(DB_FILE, JSON.stringify(seed, null, 2), 'utf-8');
+    dbMemory = seed;
+    return seed;
+  }
+}
+
+export function writeDb(data: DatabaseSchema): void {
+  dbMemory = data;
+  ensureDataDir();
+  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
+}

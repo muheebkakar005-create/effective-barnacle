@@ -1,0 +1,6 @@
+{
+  "name": "SK Brands - Premium Pakistani Fashion & Pret",
+  "description": "Luxury Pakistani fashion brand featuring embroidered chiffon, lawn, organza, silk, and bridal couture with worldwide shipping and modern shopping experience.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

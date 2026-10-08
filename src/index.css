@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --brand-yellow: #F5B016;
+    --brand-yellow-light: #FFCA47;
+    --brand-yellow-dark: #D69400;
+    --brand-blue: #1E2B8F;
+    --brand-blue-dark: #141C66;
+    --brand-dark: #18181A;
+    --brand-cream: #FCFAF7;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: #1a1a1a;
+    background-color: #fcfaf7;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: var(--font-serif);
+  }
+}
+
+.font-serif-luxury {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-sans-clean {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* SK Brand Signboard Accent Gradients */
+.bg-brand-yellow {
+  background-color: #F5B016;
+}
+
+.text-brand-yellow {
+  color: #F5B016;
+}
+
+.border-brand-yellow {
+  border-color: #F5B016;
+}
+
+.bg-brand-blue {
+  background-color: #1E2B8F;
+}
+
+.text-brand-blue {
+  color: #1E2B8F;
+}
+
+.border-brand-blue {
+  border-color: #1E2B8F;
+}
+
+.brand-gradient-yellow {
+  background: linear-gradient(135deg, #FFC938 0%, #F5B016 50%, #D69400 100%);
+}
+
+.brand-gradient-hero {
+  background: linear-gradient(135deg, #18181A 0%, #1E2B8F 60%, #141C66 100%);
+}
+
+.brand-gradient-accent {
+  background: linear-gradient(90deg, #F5B016 0%, #1E2B8F 100%);
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1ede8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c5b9ad;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9b8c7e;
+}
