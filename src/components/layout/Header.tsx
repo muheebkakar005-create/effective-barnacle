@@ -60,90 +60,87 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
   ];
 
   return (
-    <header className="w-full z-40 bg-white sticky top-0 transition-all duration-200">
-      {/* 1. Top Announcement Bar (Deep Navy #14213D) */}
-      <div className="bg-[#14213D] text-[#FFFFFF] text-[11px] sm:text-xs tracking-[0.14em] uppercase py-2 px-4 text-center font-bold border-b border-[#1D3557]">
-        <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
-          <span className="text-[#F2B705]">SK BRAND SAMI KHAN</span>
-          <span className="text-[#F2B705]">•</span>
-          <span>HAND-MADE BALOCHI DRESSES</span>
-          <span className="hidden sm:inline-block text-[#F2B705]">•</span>
-          <span className="hidden sm:inline-block">LIAQAT BAZAAR QUETTA</span>
-          <span className="hidden md:inline-block text-[#F2B705]">•</span>
-          <span className="hidden md:inline-block text-white/90">
-            WHATSAPP: <strong className="text-[#F2B705] font-mono tracking-wider">0316 0367456</strong>
-          </span>
-          <span className="hidden lg:inline-block text-[#F2B705]">•</span>
-          <span className="hidden lg:inline-block text-[#F2B705] font-extrabold">WORLDWIDE DELIVERY</span>
+    <header className="w-full z-50 sticky top-0 bg-[#FFFFFF] transition-all duration-300">
+      {/* Top Announcement Bar */}
+      <div className="bg-[#14213D] text-[#FFFFFF] py-2 px-4 text-center overflow-hidden whitespace-nowrap md:whitespace-normal">
+        <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-[10px] md:text-xs font-heading font-semibold tracking-widest uppercase animate-marquee md:animate-none">
+          <span className="text-[#F2B705] font-bold">SK BRAND SAMI KHAN</span>
+          <span className="hidden md:inline-block">•</span>
+          <span className="px-2 md:px-0">HAND-MADE BALOCHI DRESSES</span>
+          <span className="hidden md:inline-block">•</span>
+          <span className="px-2 md:px-0">LIAQAT BAZAAR QUETTA</span>
+          <span className="hidden md:inline-block">•</span>
+          <span className="px-2 md:px-0">WHATSAPP: <span className="font-mono">0316 0367456</span></span>
+          <span className="hidden md:inline-block">•</span>
+          <span className="px-2 md:px-0 font-bold">WORLDWIDE DELIVERY</span>
         </div>
       </div>
 
-      {/* 2. Main Navigation Bar (Pure White #FFFFFF with subtle shadow on scroll) */}
-      <div
-        className={`w-full bg-white border-b border-stone-200 transition-shadow duration-300 ${
-          isScrolled ? 'shadow-md' : ''
-        }`}
-      >
+      {/* Main Navigation Bar */}
+      <div className={`w-full border-b border-gray-100 transition-shadow duration-300 ${isScrolled ? 'shadow-md' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20 sm:h-22">
-            {/* Mobile Hamburger Button */}
+          <div className="flex justify-between items-center h-20">
+            {/* Mobile Menu Toggle */}
             <div className="flex items-center lg:hidden">
               <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-[#14213D] hover:text-[#F2B705] focus:outline-none transition-colors"
-                aria-label="Open menu"
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="p-2 text-[#14213D] hover:text-[#F2B705] transition-colors"
+                aria-label="Open mobile menu"
               >
-                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                <Menu className="w-6 h-6" />
               </button>
             </div>
 
-            {/* Logo Left: Pill with "SK Brand" and "SAMI KHAN • BALOCHI COUTURE" */}
-            <div className="flex-1 lg:flex-none flex items-center justify-center lg:justify-start">
-              <Link to="/" className="inline-block group transform hover:scale-[1.02] transition-transform">
-                <SKBrandLogo size="md" light={false} />
+            {/* Logo */}
+            <div className="flex-shrink-0 flex items-center justify-center lg:justify-start flex-1 lg:flex-none">
+              <Link to="/" className="hover:opacity-90 transition-opacity">
+                <SKBrandLogo size="sm" light={false} />
               </Link>
             </div>
 
-            {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center space-x-6 xl:space-x-7 font-heading">
+            {/* Desktop Nav Links */}
+            <nav className="hidden lg:flex items-center justify-center space-x-8 flex-1 font-heading">
               {mainNav.map((item) =>
                 item.isDropdown ? (
                   <div
                     key={item.label}
-                    className="relative group py-6"
+                    className="relative group h-20 flex items-center"
                     onMouseEnter={() => setIsCollectionsHovered(true)}
                     onMouseLeave={() => setIsCollectionsHovered(false)}
                   >
                     <Link
                       to={item.to}
-                      className="flex items-center gap-1 text-[13px] tracking-[0.14em] font-bold text-[#14213D] hover:text-[#F2B705] transition-colors"
+                      className="flex items-center gap-1 text-[13px] tracking-widest font-bold text-[#14213D] hover:text-[#F2B705] transition-colors"
                     >
                       {item.label}
-                      <ChevronDown className="w-3.5 h-3.5 text-[#F2B705] group-hover:rotate-180 transition-transform" />
+                      <ChevronDown className="w-4 h-4 text-[#14213D] group-hover:text-[#F2B705] transition-colors" />
                     </Link>
-                    {/* Collections Dropdown Menu */}
-                    {isCollectionsHovered && (
-                      <div className="absolute top-full left-0 w-64 bg-white shadow-2xl border border-stone-100 py-3 rounded-xl animate-in fade-in slide-in-from-top-2 duration-150 z-50">
-                        {item.children?.map((sub) => (
-                          <Link
-                            key={sub.label}
-                            to={sub.to}
-                            className="block px-5 py-2.5 text-xs tracking-wider text-[#3D3D3D] hover:text-[#14213D] hover:bg-[#F2B705]/15 transition-colors font-bold"
-                          >
-                            {sub.label}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
+                    
+                    {/* Dropdown */}
+                    <div
+                      className={`absolute top-full left-1/2 -translate-x-1/2 w-56 bg-[#FFFFFF] shadow-xl border border-gray-100 py-4 rounded-b-md transition-all duration-200 z-50 ${
+                        isCollectionsHovered ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
+                      }`}
+                    >
+                      {item.children?.map((sub) => (
+                        <Link
+                          key={sub.label}
+                          to={sub.to}
+                          className="block px-6 py-2.5 text-[12px] font-semibold text-[#14213D] tracking-wider hover:bg-[#F2B705]/10 hover:text-[#F2B705] transition-colors"
+                        >
+                          {sub.label}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 ) : (
                   <Link
                     key={item.label}
                     to={item.to}
-                    className={`text-[13px] tracking-[0.14em] font-bold transition-colors hover:text-[#F2B705] ${
+                    className={`text-[13px] tracking-widest font-bold transition-colors hover:text-[#F2B705] flex items-center h-full border-b-2 ${
                       location.pathname === item.to || (item.to !== '/' && location.search.includes(item.to.split('?')[1] || ''))
-                        ? 'text-[#14213D] font-extrabold border-b-2 border-[#F2B705] pb-0.5'
-                        : 'text-[#14213D]'
+                        ? 'text-[#F2B705] border-[#F2B705]'
+                        : 'text-[#14213D] border-transparent hover:border-[#F2B705]'
                     }`}
                   >
                     {item.label}
@@ -152,170 +149,136 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
               )}
             </nav>
 
-            {/* Right Icons: Search, Wishlist, Account, Cart, Admin button */}
-            <div className="flex items-center space-x-3 sm:space-x-4">
-              {/* Search */}
+            {/* Right Icons */}
+            <div className="flex items-center space-x-4 lg:space-x-5 flex-shrink-0">
               <button
                 onClick={onOpenSearch}
-                className="text-[#14213D] hover:text-[#F2B705] p-1.5 transition-colors"
+                className="text-[#14213D] hover:text-[#F2B705] transition-colors"
                 aria-label="Search"
               >
-                <Search className="w-5 h-5 stroke-[2.2]" />
+                <Search className="w-5 h-5" />
               </button>
 
-              {/* Wishlist Heart */}
               <Link
                 to="/wishlist"
-                className="relative text-[#14213D] hover:text-[#F2B705] p-1.5 transition-colors"
+                className="relative text-[#14213D] hover:text-[#F2B705] transition-colors"
                 aria-label="Wishlist"
               >
-                <Heart className="w-5 h-5 stroke-[2.2]" />
+                <Heart className="w-5 h-5" />
                 {wishlistCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#F2B705] text-[#14213D] text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-black shadow-xs">
+                  <span className="absolute -top-1.5 -right-1.5 bg-[#F2B705] text-[#14213D] text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                     {wishlistCount}
                   </span>
                 )}
               </Link>
 
-              {/* Account */}
               <Link
                 to={isAuthenticated ? '/account' : '/login'}
-                className="text-[#14213D] hover:text-[#F2B705] p-1.5 transition-colors flex items-center gap-1.5"
+                className="text-[#14213D] hover:text-[#F2B705] transition-colors hidden sm:block"
                 aria-label="Account"
               >
-                <UserIcon className="w-5 h-5 stroke-[2.2]" />
-                {isAuthenticated && (
-                  <span className="hidden xl:inline text-xs font-bold text-[#14213D] max-w-[80px] truncate">
-                    {user?.name.split(' ')[0]}
-                  </span>
-                )}
+                <UserIcon className="w-5 h-5" />
               </Link>
 
-              {/* Admin Button (Navy pill with gold text) */}
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  className="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg text-[11px] font-black bg-[#14213D] text-[#F2B705] tracking-widest uppercase hover:bg-[#1D3557] transition-colors border border-[#F2B705]/40 shadow-sm"
-                >
-                  ADMIN
-                </Link>
-              )}
-
-              {/* Cart Drawer Button */}
               <button
                 onClick={() => setIsDrawerOpen(true)}
-                className="relative text-[#14213D] hover:text-[#F2B705] p-1.5 transition-colors flex items-center"
+                className="relative text-[#14213D] hover:text-[#F2B705] transition-colors"
                 aria-label="Cart"
               >
-                <ShoppingBag className="w-5 h-5 stroke-[2.2]" />
+                <ShoppingBag className="w-5 h-5" />
                 {totalItemsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#F2B705] text-[#14213D] text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-black shadow-sm">
+                  <span className="absolute -top-1.5 -right-1.5 bg-[#F2B705] text-[#14213D] text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                     {totalItemsCount}
                   </span>
                 )}
               </button>
+
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="hidden xl:flex items-center px-4 py-1.5 bg-[#14213D] text-[#FFFFFF] text-xs font-heading font-bold tracking-widest rounded hover:bg-[#F2B705] hover:text-[#14213D] transition-colors"
+                >
+                  ADMIN
+                </Link>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* 3. Mobile Slide-out Drawer Menu */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex">
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-          <div className="relative w-4/5 max-w-sm bg-[#FAF6EE] h-full shadow-2xl flex flex-col z-10 p-6 overflow-y-auto font-body">
-            <div className="flex items-center justify-between pb-5 border-b border-stone-200">
-              <SKBrandLogo size="sm" />
-              <button
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="p-1.5 text-stone-600 hover:text-black"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
+      {/* Mobile Drawer */}
+      <div
+        className={`fixed inset-0 z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div
+          className={`absolute inset-0 bg-[#14213D]/40 backdrop-blur-sm transition-opacity duration-300 ${
+            isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+        
+        <div className="absolute top-0 left-0 h-full w-[85%] max-w-sm bg-[#FAF6EE] shadow-2xl flex flex-col overflow-y-auto">
+          <div className="p-6 flex items-center justify-between border-b border-gray-200">
+            <SKBrandLogo size="sm" />
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-[#14213D] hover:text-[#F2B705] transition-colors p-1"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
 
-            <nav className="flex flex-col py-6 space-y-3 font-heading">
-              <Link
-                to="/"
-                className="text-xs font-bold tracking-widest text-[#14213D] hover:text-[#F2B705] py-2 border-b border-stone-200 uppercase"
-              >
-                HOME
-              </Link>
-              <Link
-                to="/shop?category=balochi-dress"
-                className="text-xs font-bold tracking-widest text-[#14213D] py-2 border-b border-stone-200 uppercase flex items-center justify-between"
-              >
-                <span>BALOCHI DRESSES</span>
-                <span className="text-[10px] bg-[#F2B705] text-[#14213D] px-2 py-0.5 rounded font-black">HAND-MADE</span>
-              </Link>
-              <Link
-                to="/shop"
-                className="text-xs font-bold tracking-widest text-[#14213D] hover:text-[#F2B705] py-2 border-b border-stone-200 uppercase"
-              >
-                SHOP ALL
-              </Link>
-              <Link
-                to="/shop?category=new-arrivals"
-                className="text-xs font-bold tracking-widest text-[#14213D] hover:text-[#F2B705] py-2 border-b border-stone-200 uppercase"
-              >
-                NEW ARRIVALS
-              </Link>
-
-              {/* Collections Sublinks */}
-              <div className="py-2">
-                <span className="text-[11px] uppercase tracking-widest text-[#14213D] font-black block mb-2">
-                  Collections
-                </span>
-                <div className="pl-3 flex flex-col space-y-2 text-xs text-stone-700 font-semibold">
-                  {collectionsLinks.map(c => (
-                    <Link key={c.label} to={c.to} className="hover:text-[#14213D]">
-                      {c.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              <Link
-                to="/about"
-                className="text-xs font-bold tracking-widest text-[#14213D] hover:text-[#F2B705] py-2 border-b border-stone-200 uppercase"
-              >
-                ABOUT SAMI KHAN
-              </Link>
-              <Link
-                to="/contact"
-                className="text-xs font-bold tracking-widest text-[#14213D] hover:text-[#F2B705] py-2 border-b border-stone-200 uppercase"
-              >
-                CONTACT & QUETTA OUTLET
-              </Link>
-              <Link
-                to="/track-order"
-                className="text-xs font-bold tracking-widest text-[#14213D] hover:text-[#F2B705] py-2 border-b border-stone-200 uppercase"
-              >
-                TRACK ORDER
-              </Link>
-
-              {isAdmin && (
+          <nav className="flex flex-col py-4 px-6 space-y-1 font-heading">
+            {mainNav.map((item) => (
+              <React.Fragment key={item.label}>
                 <Link
-                  to="/admin"
-                  className="text-xs font-bold tracking-widest bg-[#14213D] text-[#F2B705] p-2.5 rounded-lg uppercase text-center"
+                  to={item.to}
+                  className="py-4 text-[13px] font-bold tracking-widest text-[#14213D] hover:text-[#F2B705] border-b border-gray-200 uppercase"
                 >
-                  ADMIN DASHBOARD
+                  {item.label}
                 </Link>
-              )}
-            </nav>
+                {item.isDropdown && item.children && (
+                  <div className="pl-4 border-b border-gray-200 pb-2">
+                    {item.children.map((sub) => (
+                      <Link
+                        key={sub.label}
+                        to={sub.to}
+                        className="block py-3 text-[12px] font-semibold tracking-wider text-[#3D3D3D] hover:text-[#F2B705]"
+                      >
+                        {sub.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </React.Fragment>
+            ))}
+            
+            <Link
+              to={isAuthenticated ? '/account' : '/login'}
+              className="py-4 text-[13px] font-bold tracking-widest text-[#14213D] hover:text-[#F2B705] border-b border-gray-200 uppercase"
+            >
+              {isAuthenticated ? 'MY ACCOUNT' : 'LOGIN / REGISTER'}
+            </Link>
 
-            <div className="mt-auto pt-6 border-t border-stone-200 text-xs text-stone-600 space-y-1.5">
-              <p className="font-bold text-[#14213D]">Naseem Fashion Mall, Liaqat Bazaar, Quetta</p>
-              <p>Phone: 0314 0003801</p>
-              <p>WhatsApp: 0316 0367456</p>
-              <p className="text-[11px] text-[#F2B705] font-black">All Pakistan & Worldwide Express Delivery</p>
-            </div>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="mt-6 py-3 px-4 bg-[#14213D] text-[#FFFFFF] text-center text-[12px] font-bold tracking-widest hover:bg-[#F2B705] hover:text-[#14213D] transition-colors rounded uppercase"
+              >
+                ADMIN DASHBOARD
+              </Link>
+            )}
+          </nav>
+
+          <div className="mt-auto p-6 bg-[#14213D] text-[#FFFFFF] font-body text-sm space-y-2">
+            <p className="font-heading font-bold text-[#F2B705]">SK Brand Quetta</p>
+            <p className="text-gray-300">Liaqat Bazaar, Quetta</p>
+            <p className="text-gray-300 flex items-center gap-2">WhatsApp: <span className="font-mono text-[#F2B705]">0316 0367456</span></p>
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 };

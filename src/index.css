@@ -7,21 +7,23 @@
     --font-display: 'Montserrat', sans-serif;
 
     /* Exact Color Palette from SK Brand Brief */
-    --color-golden-yellow: #F2B705;
-    --color-golden-yellow-hover: #D9A404;
-    --color-deep-navy: #14213D;
-    --color-midnight-blue: #1D3557;
-    --color-warm-cream: #FAF6EE;
-    --color-pure-white: #FFFFFF;
-    --color-whatsapp-green: #25D366;
-    --color-brick-red: #C1272D;
-    --color-body-charcoal: #3D3D3D;
+    --color-primary: #F2B705;
+    --color-navy: #14213D;
+    --color-midnight: #1D3557;
+    --color-cream: #FAF6EE;
+    --color-whatsapp: #25D366;
+    --color-sale: #C1272D;
+    --color-charcoal: #3D3D3D;
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
     font-family: var(--font-body);
-    color: var(--color-body-charcoal);
-    background-color: var(--color-warm-cream);
+    color: var(--color-charcoal);
+    background-color: var(--color-cream);
     line-height: 1.55;
     font-size: 15px;
   }
@@ -39,7 +41,7 @@
     font-weight: 800;
     line-height: 1.15;
     letter-spacing: -0.02em;
-    color: var(--color-deep-navy);
+    color: var(--color-navy);
   }
 
   h2, .section-heading {
@@ -48,7 +50,7 @@
     font-weight: 700;
     line-height: 1.25;
     letter-spacing: -0.01em;
-    color: var(--color-deep-navy);
+    color: var(--color-navy);
   }
 
   h3, .sub-heading {
@@ -56,7 +58,7 @@
     font-size: clamp(20px, 2.5vw, 28px);
     font-weight: 600;
     line-height: 1.3;
-    color: var(--color-deep-navy);
+    color: var(--color-navy);
   }
 
   p {
@@ -64,7 +66,7 @@
     font-size: clamp(15px, 1.2vw, 17px);
     font-weight: 400;
     line-height: 1.55;
-    color: var(--color-body-charcoal);
+    color: var(--color-charcoal);
   }
 
   button, .btn-cta {
@@ -80,106 +82,121 @@
     font-weight: 400;
     line-height: 1.4;
   }
+
+  /* Selection highlight */
+  ::selection {
+    background-color: var(--color-primary);
+    color: var(--color-navy);
+  }
+
+  /* Focus ring styles */
+  *:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
 }
 
-.font-heading {
-  font-family: 'Montserrat', 'Poppins', sans-serif;
+@layer utilities {
+  .font-heading {
+    font-family: var(--font-heading);
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .animate-slideUp {
+    animation: slideUp 0.4s ease-out forwards;
+  }
+
+  .animate-slideDown {
+    animation: slideDown 0.4s ease-out forwards;
+  }
+
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
 }
 
-.font-body {
-  font-family: 'Inter', 'Poppins', sans-serif;
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
 }
 
 /* Color Utility Classes */
-.bg-golden-yellow {
-  background-color: #F2B705;
-}
+.bg-golden-yellow { background-color: var(--color-primary); }
+.text-golden-yellow { color: var(--color-primary); }
+.border-golden-yellow { border-color: var(--color-primary); }
 
-.text-golden-yellow {
-  color: #F2B705;
-}
+.bg-deep-navy { background-color: var(--color-navy); }
+.text-deep-navy { color: var(--color-navy); }
+.border-deep-navy { border-color: var(--color-navy); }
 
-.border-golden-yellow {
-  border-color: #F2B705;
-}
+.bg-midnight-blue { background-color: var(--color-midnight); }
+.text-midnight-blue { color: var(--color-midnight); }
+.border-midnight-blue { border-color: var(--color-midnight); }
 
-.bg-deep-navy {
-  background-color: #14213D;
-}
+.bg-warm-cream { background-color: var(--color-cream); }
 
-.text-deep-navy {
-  color: #14213D;
-}
+.bg-whatsapp-green { background-color: var(--color-whatsapp); }
+.text-whatsapp-green { color: var(--color-whatsapp); }
 
-.border-deep-navy {
-  border-color: #14213D;
-}
-
-.bg-midnight-blue {
-  background-color: #1D3557;
-}
-
-.text-midnight-blue {
-  color: #1D3557;
-}
-
-.border-midnight-blue {
-  border-color: #1D3557;
-}
-
-.bg-warm-cream {
-  background-color: #FAF6EE;
-}
-
-.bg-whatsapp-green {
-  background-color: #25D366;
-}
-
-.text-whatsapp-green {
-  color: #25D366;
-}
-
-.bg-brick-red {
-  background-color: #C1272D;
-}
-
-.text-brick-red {
-  color: #C1272D;
-}
+.bg-brick-red { background-color: var(--color-sale); }
+.text-brick-red { color: var(--color-sale); }
 
 /* Custom Interactive Brand Buttons */
 .brand-btn-yellow {
-  background-color: #F2B705;
-  color: #14213D;
+  background-color: var(--color-primary);
+  color: var(--color-navy);
   font-weight: 700;
   transition: all 0.2s ease-in-out;
 }
 
 .brand-btn-yellow:hover {
-  background-color: #D9A404;
+  filter: brightness(0.9);
   transform: translateY(-1px);
 }
 
 .brand-btn-navy {
-  background-color: #14213D;
+  background-color: var(--color-navy);
   color: #FFFFFF;
   font-weight: 600;
   transition: all 0.2s ease-in-out;
 }
 
 .brand-btn-navy:hover {
-  background-color: #1D3557;
+  background-color: var(--color-midnight);
 }
 
 .brand-btn-whatsapp {
-  background-color: #25D366;
+  background-color: var(--color-whatsapp);
   color: #000000;
   font-weight: 700;
   transition: all 0.2s ease-in-out;
 }
 
 .brand-btn-whatsapp:hover {
-  background-color: #1EBE5D;
+  filter: brightness(0.9);
 }
 
 /* Custom subtle scrollbar */
@@ -189,14 +206,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #FAF6EE;
+  background: var(--color-cream);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D9A404;
+  background: var(--color-navy);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #14213D;
+  background: var(--color-primary);
 }

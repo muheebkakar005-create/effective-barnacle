@@ -17,67 +17,68 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-[#1A365D] text-[#EFF6FF] border-t border-[#10243E] pt-16 pb-12 font-body">
+    <footer className="bg-[#14213D] text-[#FFFFFF] font-body pt-16 pb-8 border-t-[4px] border-[#F2B705]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Top Newsletter & Brand Quote */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-16 border-b border-white/10">
-          <div className="lg:col-span-5 space-y-4">
-            <Link to="/" className="inline-block group">
+        
+        {/* Top Section */}
+        <div className="flex flex-col lg:flex-row justify-between items-start gap-12 pb-16 border-b border-[#1D3557]">
+          
+          {/* Brand Info */}
+          <div className="lg:w-5/12 space-y-6">
+            <Link to="/" className="inline-block hover:opacity-90 transition-opacity">
               <SKBrandLogo size="md" light={true} showTagline={false} />
             </Link>
-            <p className="text-stone-300 text-sm leading-relaxed max-w-md pt-1">
-              Curated by <strong className="text-white">Sami Khan</strong>. Authentic hand-made Balochi Doch dresses, fine machine embroidery suits, and royal pret crafted in Quetta and delivered to discerning patrons worldwide.
+            <p className="text-gray-300 text-sm leading-relaxed max-w-md font-body">
+              SK Brand by Sami Khan brings you the finest handcrafted Balochi Doch dresses, premium machine embroidery suits, and royal pret wear directly from our showroom in Liaqat Bazaar, Quetta to your doorstep worldwide.
             </p>
-            <div className="flex items-center gap-3 pt-2 flex-wrap">
+            <div className="flex flex-wrap gap-4 pt-2">
               <a
                 href={generateGeneralWhatsAppUrl('+923160367456')}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded text-xs font-bold bg-[#FFCC00] text-[#000000] hover:bg-[#E6B800] transition-colors shadow-md"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded text-[13px] font-bold bg-[#25D366] text-[#FFFFFF] hover:bg-[#128C7E] transition-colors"
               >
-                <MessageCircle className="w-4 h-4 fill-black" />
-                WhatsApp: 0316 0367456
+                <MessageCircle className="w-4 h-4" />
+                WhatsApp Us
               </a>
               <Link
                 to="/track-order"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded text-xs font-semibold bg-white/10 text-white hover:bg-white/20 transition-colors border border-white/20"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded text-[13px] font-bold bg-[#1D3557] text-[#FFFFFF] hover:bg-[#F2B705] hover:text-[#14213D] transition-colors border border-[#1D3557] hover:border-[#F2B705]"
               >
-                Track Your Order
+                Track Order
               </Link>
             </div>
           </div>
 
-          <div className="lg:col-span-7 bg-[#10243E]/80 p-6 md:p-8 rounded-xl border border-white/10 shadow-lg">
-            <span className="text-xs font-extrabold uppercase tracking-[0.25em] text-[#FFCC00] block mb-2 font-heading">
-              Privilege Club
-            </span>
-            <h3 className="font-heading text-xl md:text-2xl font-bold text-white mb-2">
-              Receive 10% Off Your First Order
+          {/* Newsletter Section */}
+          <div className="lg:w-6/12 bg-[#1D3557] p-8 rounded-lg border border-[#F2B705]/20 shadow-lg w-full">
+            <h3 className="font-heading text-xl font-bold text-[#F2B705] mb-3">
+              Join the SK Privilege Club
             </h3>
-            <p className="text-stone-300 text-xs sm:text-sm mb-6">
-              Subscribe for exclusive previews of upcoming festive Balochi Doch collections, private sales, and sartorial inspirations.
+            <p className="text-gray-300 text-sm mb-6 font-body">
+              Subscribe for early access to new Balochi Doch collections, exclusive sales, and a 10% discount on your first order.
             </p>
 
             {subscribed ? (
-              <div className="bg-emerald-950/80 border border-emerald-500/50 p-4 rounded text-sm text-emerald-300 flex items-center gap-3">
-                <Check className="w-5 h-5 text-emerald-400 shrink-0" />
+              <div className="bg-[#25D366]/10 border border-[#25D366] p-4 rounded text-sm text-[#FFFFFF] flex items-center gap-3">
+                <Check className="w-5 h-5 text-[#25D366] flex-shrink-0" />
                 <span>
-                  Welcome to the SK Brands circle! Use promo code <strong className="text-white underline">WELCOME10</strong> at checkout for 10% discount.
+                  Welcome to SK Brand! Use promo code <strong className="text-[#F2B705]">WELCOME10</strong> at checkout.
                 </span>
               </div>
             ) : (
-              <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row gap-2">
+              <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="email"
                   required
                   placeholder="Enter your email address"
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
-                  className="bg-black/40 border border-white/20 rounded-lg px-4 py-3 text-sm text-white placeholder-stone-400 focus:outline-none focus:border-[#FFCC00] flex-1"
+                  className="bg-[#14213D] border border-gray-600 rounded px-4 py-3 text-sm text-[#FFFFFF] placeholder-gray-400 focus:outline-none focus:border-[#F2B705] flex-1 font-body"
                 />
                 <button
                   type="submit"
-                  className="bg-[#FFCC00] hover:bg-[#E6B800] text-[#000000] font-bold px-6 py-3 text-xs tracking-widest uppercase transition-all flex items-center justify-center gap-2 rounded-lg shrink-0 shadow-md hover:scale-[1.02]"
+                  className="bg-[#F2B705] hover:bg-[#FFFFFF] text-[#14213D] font-bold px-6 py-3 text-sm tracking-widest uppercase transition-colors flex items-center justify-center gap-2 rounded flex-shrink-0 font-heading"
                 >
                   Subscribe
                   <ArrowRight className="w-4 h-4" />
@@ -87,97 +88,92 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        {/* Navigation Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-12 border-b border-white/10 text-xs sm:text-sm">
-          {/* Shop */}
-          <div className="space-y-3">
-            <h4 className="font-heading font-bold tracking-widest uppercase text-xs text-[#FFCC00]">
+        {/* Navigation Links Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 py-16 border-b border-[#1D3557]">
+          
+          <div className="space-y-4">
+            <h4 className="font-heading font-bold tracking-widest uppercase text-[13px] text-[#F2B705]">
               Shop Collections
             </h4>
-            <ul className="space-y-2.5 text-stone-300">
-              <li><Link to="/shop?category=balochi-dress" className="hover:text-[#FFCC00] transition-colors font-semibold text-white">Balochi Doch Hand-Made</Link></li>
-              <li><Link to="/shop?category=new-arrivals" className="hover:text-[#FFCC00] transition-colors">New Arrivals</Link></li>
-              <li><Link to="/shop?category=formal-wear" className="hover:text-[#FFCC00] transition-colors">Formal Wear</Link></li>
-              <li><Link to="/shop?category=casual-wear" className="hover:text-[#FFCC00] transition-colors">Casual Lawn</Link></li>
-              <li><Link to="/shop?category=party-wear" className="hover:text-[#FFCC00] transition-colors">Party Wear</Link></li>
-              <li><Link to="/shop?category=bridal-couture" className="hover:text-[#FFCC00] transition-colors">Bridal Couture</Link></li>
+            <ul className="space-y-3 font-body text-[14px]">
+              <li><Link to="/shop?category=balochi-dress" className="text-gray-300 hover:text-[#F2B705] transition-colors">Balochi Hand-Made</Link></li>
+              <li><Link to="/shop?category=new-arrivals" className="text-gray-300 hover:text-[#F2B705] transition-colors">New Arrivals</Link></li>
+              <li><Link to="/shop?category=party-wear" className="text-gray-300 hover:text-[#F2B705] transition-colors">Party Wear</Link></li>
+              <li><Link to="/shop?category=bridal-couture" className="text-gray-300 hover:text-[#F2B705] transition-colors">Bridal Couture</Link></li>
+              <li><Link to="/shop?category=casual-wear" className="text-gray-300 hover:text-[#F2B705] transition-colors">Casual Wear</Link></li>
             </ul>
           </div>
 
-          {/* Shop by Fabric */}
-          <div className="space-y-3">
-            <h4 className="font-heading font-bold tracking-widest uppercase text-xs text-[#FFCC00]">
+          <div className="space-y-4">
+            <h4 className="font-heading font-bold tracking-widest uppercase text-[13px] text-[#F2B705]">
               Shop By Fabric
             </h4>
-            <ul className="space-y-2.5 text-stone-300">
-              <li><Link to="/shop?fabric=Chiffon" className="hover:text-[#FFCC00] transition-colors">Pure Chiffon</Link></li>
-              <li><Link to="/shop?fabric=Lawn" className="hover:text-[#FFCC00] transition-colors">Festive Lawn</Link></li>
-              <li><Link to="/shop?fabric=Organza" className="hover:text-[#FFCC00] transition-colors">Embroidered Organza</Link></li>
-              <li><Link to="/shop?fabric=Silk" className="hover:text-[#FFCC00] transition-colors">Raw Silk</Link></li>
-              <li><Link to="/shop?fabric=Velvet" className="hover:text-[#FFCC00] transition-colors">Royal Velvet</Link></li>
-              <li><Link to="/shop?fabric=Cotton" className="hover:text-[#FFCC00] transition-colors">Cotton Silk</Link></li>
+            <ul className="space-y-3 font-body text-[14px]">
+              <li><Link to="/shop?fabric=Chiffon" className="text-gray-300 hover:text-[#F2B705] transition-colors">Pure Chiffon</Link></li>
+              <li><Link to="/shop?fabric=Lawn" className="text-gray-300 hover:text-[#F2B705] transition-colors">Festive Lawn</Link></li>
+              <li><Link to="/shop?fabric=Organza" className="text-gray-300 hover:text-[#F2B705] transition-colors">Organza</Link></li>
+              <li><Link to="/shop?fabric=Silk" className="text-gray-300 hover:text-[#F2B705] transition-colors">Raw Silk</Link></li>
+              <li><Link to="/shop?fabric=Velvet" className="text-gray-300 hover:text-[#F2B705] transition-colors">Velvet</Link></li>
             </ul>
           </div>
 
-          {/* Customer Care */}
-          <div className="space-y-3">
-            <h4 className="font-heading font-bold tracking-widest uppercase text-xs text-[#FFCC00]">
+          <div className="space-y-4">
+            <h4 className="font-heading font-bold tracking-widest uppercase text-[13px] text-[#F2B705]">
               Customer Care
             </h4>
-            <ul className="space-y-2.5 text-stone-300">
-              <li><Link to="/track-order" className="hover:text-[#FFCC00] transition-colors">Order Tracking</Link></li>
-              <li><Link to="/shipping-policy" className="hover:text-[#FFCC00] transition-colors">Worldwide Shipping</Link></li>
-              <li><Link to="/return-policy" className="hover:text-[#FFCC00] transition-colors">Returns & Exchanges</Link></li>
-              <li><Link to="/faq" className="hover:text-[#FFCC00] transition-colors">Frequently Asked Questions</Link></li>
-              <li><Link to="/contact" className="hover:text-[#FFCC00] transition-colors">Contact Concierge</Link></li>
-              <li><Link to="/terms" className="hover:text-[#FFCC00] transition-colors">Terms & Conditions</Link></li>
+            <ul className="space-y-3 font-body text-[14px]">
+              <li><Link to="/track-order" className="text-gray-300 hover:text-[#F2B705] transition-colors">Track Your Order</Link></li>
+              <li><Link to="/shipping-policy" className="text-gray-300 hover:text-[#F2B705] transition-colors">Shipping Information</Link></li>
+              <li><Link to="/return-policy" className="text-gray-300 hover:text-[#F2B705] transition-colors">Returns & Exchanges</Link></li>
+              <li><Link to="/faq" className="text-gray-300 hover:text-[#F2B705] transition-colors">FAQs</Link></li>
+              <li><Link to="/contact" className="text-gray-300 hover:text-[#F2B705] transition-colors">Contact Us</Link></li>
             </ul>
           </div>
 
-          {/* Contact Details */}
-          <div className="space-y-3">
-            <h4 className="font-heading font-bold tracking-widest uppercase text-xs text-[#FFCC00]">
-              Showroom & Concierge
+          <div className="space-y-4">
+            <h4 className="font-heading font-bold tracking-widest uppercase text-[13px] text-[#F2B705]">
+              Showroom & Contact
             </h4>
-            <ul className="space-y-2.5 text-stone-300">
-              <li className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-[#FFCC00] shrink-0 mt-0.5" />
+            <ul className="space-y-4 font-body text-[14px] text-gray-300">
+              <li className="flex items-start gap-3">
+                <MapPin className="w-5 h-5 text-[#F2B705] flex-shrink-0 mt-0.5" />
                 <span className="leading-snug">
-                  Bazaar, Liaqat Bazaar Naseem Fashion Mall Sk Brand, Shara Liaqat, Quetta, 87300, Pakistan
+                  Naseem Fashion Mall, SK Brand, Liaqat Bazaar, Quetta, Pakistan
                 </span>
               </li>
-              <li className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-[#FFCC00] shrink-0" />
-                <span>0314 0003801 / 0316 0367456</span>
+              <li className="flex items-center gap-3">
+                <Phone className="w-5 h-5 text-[#F2B705] flex-shrink-0" />
+                <span>0314 0003801 <br/> 0316 0367456</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-[#FFCC00] shrink-0" />
-                <span>samikhan@skbrand.pk</span>
-              </li>
-              <li className="pt-2 text-xs text-[#93C5FD]">
-                Liaqat Bazaar Quetta • Mon - Sat: 11:00 AM - 9:30 PM PKT
+              <li className="flex items-center gap-3">
+                <Mail className="w-5 h-5 text-[#F2B705] flex-shrink-0" />
+                <a href="mailto:samikhan@skbrand.pk" className="hover:text-[#F2B705] transition-colors">samikhan@skbrand.pk</a>
               </li>
             </ul>
           </div>
+
         </div>
 
-        {/* Payment Notice & Bottom Bar */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-stone-300">
-          <div className="flex items-center gap-2 text-[#93C5FD]">
-            <ShieldCheck className="w-4 h-4 text-[#FFCC00]" />
-            <span>Meezan Bank Limited (Liaqat Bazaar Quetta Branch) • Worldwide Delivery by DHL & Express Post</span>
+        {/* Bottom Bar */}
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-6 font-body text-[13px]">
+          
+          <div className="flex items-center gap-2 text-gray-400">
+            <ShieldCheck className="w-5 h-5 text-[#F2B705]" />
+            <span>Secure Checkout • Worldwide Express Delivery via DHL/FedEx</span>
           </div>
 
-          <div className="flex items-center gap-6">
-            <Link to="/privacy-policy" className="hover:text-[#FFCC00] transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-[#FFCC00] transition-colors">Terms of Service</Link>
-            <Link to="/admin/login" className="hover:text-[#FFCC00] transition-colors text-[#FFCC00] font-bold">Admin Portal</Link>
+          <div className="flex flex-wrap items-center justify-center gap-6 text-gray-400">
+            <Link to="/privacy-policy" className="hover:text-[#F2B705] transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-[#F2B705] transition-colors">Terms of Service</Link>
+            <Link to="/admin" className="text-[#F2B705] font-bold hover:text-[#FFFFFF] transition-colors">Admin Portal</Link>
           </div>
+
+        </div>
+        
+        <div className="text-center text-gray-500 text-xs mt-8 font-body">
+          © {new Date().getFullYear()} SK BRAND SAMI KHAN • QUETTA • BALOCHI DRESSES. All rights reserved.
         </div>
 
-        <div className="text-center text-xs text-stone-400 pt-6">
-          © {new Date().getFullYear()} SK BRAND SAMI KHAN • QUETTA • BALOCHI DOCH. All rights reserved.
-        </div>
       </div>
     </footer>
   );
