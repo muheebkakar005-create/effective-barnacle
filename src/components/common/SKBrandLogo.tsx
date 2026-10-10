@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface SKBrandLogoProps {
   className?: string;
@@ -13,87 +13,99 @@ export const SKBrandLogo: React.FC<SKBrandLogoProps> = ({
   className = '',
   size = 'md',
   light = false,
-  stacked = false,
   showTagline = true
 }) => {
+  const [imgError, setImgError] = useState(false);
+
+  // Height mappings for image logo to fit headers & footers perfectly
+  const imageHeights = {
+    sm: 'h-9 sm:h-10 max-h-10',
+    md: 'h-11 sm:h-12 max-h-12',
+    lg: 'h-14 sm:h-16 max-h-16',
+    xl: 'h-18 sm:h-20',
+    '2xl': 'h-24'
+  };
+
+  // Preferred image paths
+  const logoImageSrc = light ? '/sk-brand-logo-desktop.png' : '/images/sk-logo-desktop.png';
+
+  if (!imgError) {
+    return (
+      <div className={`inline-flex items-center shrink-0 ${className}`}>
+        <img
+          src={logoImageSrc}
+          alt="SK Brand Sami Khan"
+          onError={() => setImgError(true)}
+          className={`${imageHeights[size]} w-auto object-contain transition-transform duration-200 hover:scale-[1.02]`}
+        />
+      </div>
+    );
+  }
+
+  // Compact fallback CSS pill badge (guaranteed no overflow)
   const pillPadding = {
-    sm: 'px-3 py-1.5 rounded-lg',
-    md: 'px-4 py-2 rounded-xl',
-    lg: 'px-5 py-2.5 rounded-2xl',
-    xl: 'px-6 py-3.5 rounded-2xl',
-    '2xl': 'px-8 py-4.5 rounded-3xl'
+    sm: 'px-2.5 py-1 rounded-lg',
+    md: 'px-3 py-1.5 rounded-xl',
+    lg: 'px-4 py-2 rounded-xl',
+    xl: 'px-5 py-3 rounded-2xl',
+    '2xl': 'px-7 py-4 rounded-3xl'
   };
 
   const skTextSize = {
-    sm: 'text-xl',
-    md: 'text-2xl',
-    lg: 'text-3xl',
-    xl: 'text-4xl',
-    '2xl': 'text-5xl'
-  };
-
-  const brandTextSize = {
-    sm: 'text-lg',
-    md: 'text-xl',
+    sm: 'text-base sm:text-lg',
+    md: 'text-lg sm:text-xl',
     lg: 'text-2xl',
     xl: 'text-3xl',
     '2xl': 'text-4xl'
   };
 
-  const taglineSize = {
-    sm: 'text-[8px] tracking-[0.2em]',
-    md: 'text-[9px] tracking-[0.22em]',
-    lg: 'text-[11px] tracking-[0.25em]',
-    xl: 'text-xs tracking-[0.28em]',
-    '2xl': 'text-sm tracking-[0.3em]'
+  const brandTextSize = {
+    sm: 'text-sm sm:text-base',
+    md: 'text-base sm:text-lg',
+    lg: 'text-xl',
+    xl: 'text-2xl',
+    '2xl': 'text-3xl'
   };
 
-  // Header (light version): Yellow pill #F2B705 + navy text #14213D
-  // Footer (dark version): Inverted: navy pill #14213D + gold text #F2B705
-  const isDark = light; // when light=true (e.g. inside dark footer/hero), use the dark/inverted pill
+  const taglineSize = {
+    sm: 'text-[7px] tracking-[0.16em]',
+    md: 'text-[8px] tracking-[0.18em]',
+    lg: 'text-[10px] tracking-[0.22em]',
+    xl: 'text-xs tracking-[0.25em]',
+    '2xl': 'text-sm tracking-[0.28em]'
+  };
+
+  const isDark = light;
   const bgClass = isDark
-    ? 'bg-[#14213D] border-2 border-[#F2B705]/60 shadow-lg'
-    : 'bg-[#F2B705] border-2 border-[#14213D]/10 shadow-md hover:shadow-lg';
+    ? 'bg-[#14213D] border border-[#F2B705]/60 shadow-md'
+    : 'bg-[#F2B705] border border-[#14213D]/20 shadow-sm hover:shadow-md';
 
   const textColor = isDark ? 'text-[#F2B705]' : 'text-[#14213D]';
   const tagColor = isDark ? 'text-white/90' : 'text-[#14213D]/90';
 
   return (
     <div
-      className={`inline-flex flex-col items-center justify-center transition-all duration-300 select-none ${bgClass} ${pillPadding[size]} ${className}`}
-      style={{
-        borderRadius: size === 'sm' ? '12px' : size === 'md' ? '14px' : '16px'
-      }}
+      className={`inline-flex flex-col items-center justify-center transition-all duration-200 select-none shrink-0 ${bgClass} ${pillPadding[size]} ${className}`}
     >
-      {/* Main Logo Text: "SK" (bold brush/italic script style) + "Brand" (heavy geometric sans-serif) */}
-      <div className={`flex items-baseline gap-1.5 leading-none ${textColor}`}>
+      <div className={`flex items-baseline gap-1 leading-none ${textColor}`}>
         <span
-          className={`font-serif italic font-black tracking-tighter ${skTextSize[size]}`}
-          style={{
-            fontFamily: "'Cormorant Garamond', Georgia, serif",
-            letterSpacing: '-0.04em',
-            transform: 'skewX(-4deg)'
-          }}
+          className={`font-serif italic font-black ${skTextSize[size]}`}
+          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
         >
           SK
         </span>
         <span
-          className={`font-heading font-black tracking-tight ${brandTextSize[size]}`}
-          style={{
-            fontFamily: "'Montserrat', 'Poppins', sans-serif"
-          }}
+          className={`font-heading font-black ${brandTextSize[size]}`}
+          style={{ fontFamily: "'Montserrat', 'Poppins', sans-serif" }}
         >
           Brand
         </span>
       </div>
 
-      {/* Small Letter-Spaced Tagline: SAMI KHAN • BALOCHI COUTURE */}
       {showTagline && (
         <span
-          className={`uppercase font-bold pt-1 ${taglineSize[size]} ${tagColor} text-center whitespace-nowrap`}
-          style={{
-            fontFamily: "'Inter', 'Poppins', sans-serif"
-          }}
+          className={`uppercase font-bold pt-0.5 ${taglineSize[size]} ${tagColor} text-center whitespace-nowrap`}
+          style={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}
         >
           SAMI KHAN • BALOCHI COUTURE
         </span>
@@ -101,3 +113,4 @@ export const SKBrandLogo: React.FC<SKBrandLogoProps> = ({
     </div>
   );
 };
+

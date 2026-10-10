@@ -79,7 +79,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
       {/* Main Navigation Bar */}
       <div className={`w-full border-b border-gray-100 transition-shadow duration-300 ${isScrolled ? 'shadow-md' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
+          <div className="flex justify-between items-center h-20 gap-4">
             {/* Mobile Menu Toggle */}
             <div className="flex items-center lg:hidden">
               <button
@@ -92,14 +92,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
             </div>
 
             {/* Logo */}
-            <div className="flex-shrink-0 flex items-center justify-center lg:justify-start flex-1 lg:flex-none">
-              <Link to="/" className="hover:opacity-90 transition-opacity">
+            <div className="shrink-0 flex items-center pr-2 sm:pr-6">
+              <Link to="/" className="hover:opacity-90 transition-opacity flex items-center">
                 <SKBrandLogo size="sm" light={false} />
               </Link>
             </div>
 
             {/* Desktop Nav Links */}
-            <nav className="hidden lg:flex items-center justify-center space-x-8 flex-1 font-heading">
+            <nav className="hidden lg:flex items-center justify-center space-x-6 xl:space-x-8 font-heading flex-1">
               {mainNav.map((item) =>
                 item.isDropdown ? (
                   <div
