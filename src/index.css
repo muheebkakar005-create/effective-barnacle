@@ -2,71 +2,184 @@
 
 @layer base {
   :root {
-    --font-serif: 'Cormorant Garamond', Georgia, serif;
-    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    --brand-yellow: #F5B016;
-    --brand-yellow-light: #FFCA47;
-    --brand-yellow-dark: #D69400;
-    --brand-blue: #1E2B8F;
-    --brand-blue-dark: #141C66;
-    --brand-dark: #18181A;
-    --brand-cream: #FCFAF7;
+    --font-heading: 'Montserrat', 'Poppins', system-ui, -apple-system, sans-serif;
+    --font-body: 'Inter', 'Poppins', system-ui, -apple-system, sans-serif;
+    --font-display: 'Montserrat', sans-serif;
+
+    /* Exact Color Palette from SK Brand Brief */
+    --color-golden-yellow: #F2B705;
+    --color-golden-yellow-hover: #D9A404;
+    --color-deep-navy: #14213D;
+    --color-midnight-blue: #1D3557;
+    --color-warm-cream: #FAF6EE;
+    --color-pure-white: #FFFFFF;
+    --color-whatsapp-green: #25D366;
+    --color-brick-red: #C1272D;
+    --color-body-charcoal: #3D3D3D;
   }
 
   body {
-    font-family: var(--font-sans);
-    color: #1a1a1a;
-    background-color: #fcfaf7;
+    font-family: var(--font-body);
+    color: var(--color-body-charcoal);
+    background-color: var(--color-warm-cream);
+    line-height: 1.55;
+    font-size: 15px;
   }
 
-  h1, h2, h3, .font-display {
-    font-family: var(--font-serif);
+  @media (min-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+  }
+
+  /* Responsive Typography Scale according to Brand Guide */
+  h1, .hero-title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--color-deep-navy);
+  }
+
+  h2, .section-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(24px, 3.5vw, 40px);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--color-deep-navy);
+  }
+
+  h3, .sub-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(20px, 2.5vw, 28px);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-deep-navy);
+  }
+
+  p {
+    font-family: var(--font-body);
+    font-size: clamp(15px, 1.2vw, 17px);
+    font-weight: 400;
+    line-height: 1.55;
+    color: var(--color-body-charcoal);
+  }
+
+  button, .btn-cta {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.0;
+  }
+
+  .caption-text, small {
+    font-family: var(--font-body);
+    font-size: clamp(13px, 1vw, 14px);
+    font-weight: 400;
+    line-height: 1.4;
   }
 }
 
-.font-serif-luxury {
-  font-family: 'Cormorant Garamond', Georgia, serif;
+.font-heading {
+  font-family: 'Montserrat', 'Poppins', sans-serif;
 }
 
-.font-sans-clean {
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+.font-body {
+  font-family: 'Inter', 'Poppins', sans-serif;
 }
 
-/* SK Brand Signboard Accent Gradients */
-.bg-brand-yellow {
-  background-color: #F5B016;
+/* Color Utility Classes */
+.bg-golden-yellow {
+  background-color: #F2B705;
 }
 
-.text-brand-yellow {
-  color: #F5B016;
+.text-golden-yellow {
+  color: #F2B705;
 }
 
-.border-brand-yellow {
-  border-color: #F5B016;
+.border-golden-yellow {
+  border-color: #F2B705;
 }
 
-.bg-brand-blue {
-  background-color: #1E2B8F;
+.bg-deep-navy {
+  background-color: #14213D;
 }
 
-.text-brand-blue {
-  color: #1E2B8F;
+.text-deep-navy {
+  color: #14213D;
 }
 
-.border-brand-blue {
-  border-color: #1E2B8F;
+.border-deep-navy {
+  border-color: #14213D;
 }
 
-.brand-gradient-yellow {
-  background: linear-gradient(135deg, #FFC938 0%, #F5B016 50%, #D69400 100%);
+.bg-midnight-blue {
+  background-color: #1D3557;
 }
 
-.brand-gradient-hero {
-  background: linear-gradient(135deg, #18181A 0%, #1E2B8F 60%, #141C66 100%);
+.text-midnight-blue {
+  color: #1D3557;
 }
 
-.brand-gradient-accent {
-  background: linear-gradient(90deg, #F5B016 0%, #1E2B8F 100%);
+.border-midnight-blue {
+  border-color: #1D3557;
+}
+
+.bg-warm-cream {
+  background-color: #FAF6EE;
+}
+
+.bg-whatsapp-green {
+  background-color: #25D366;
+}
+
+.text-whatsapp-green {
+  color: #25D366;
+}
+
+.bg-brick-red {
+  background-color: #C1272D;
+}
+
+.text-brick-red {
+  color: #C1272D;
+}
+
+/* Custom Interactive Brand Buttons */
+.brand-btn-yellow {
+  background-color: #F2B705;
+  color: #14213D;
+  font-weight: 700;
+  transition: all 0.2s ease-in-out;
+}
+
+.brand-btn-yellow:hover {
+  background-color: #D9A404;
+  transform: translateY(-1px);
+}
+
+.brand-btn-navy {
+  background-color: #14213D;
+  color: #FFFFFF;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.brand-btn-navy:hover {
+  background-color: #1D3557;
+}
+
+.brand-btn-whatsapp {
+  background-color: #25D366;
+  color: #000000;
+  font-weight: 700;
+  transition: all 0.2s ease-in-out;
+}
+
+.brand-btn-whatsapp:hover {
+  background-color: #1EBE5D;
 }
 
 /* Custom subtle scrollbar */
@@ -76,14 +189,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1ede8;
+  background: #FAF6EE;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c5b9ad;
+  background: #D9A404;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9b8c7e;
+  background: #14213D;
 }

@@ -1,6 +1,6 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, Shield, Globe, Award, ChevronRight } from 'lucide-react';
+import { ArrowRight, Sparkles, Shield, Globe, Award, ChevronRight, MessageCircle, Ruler, Scissors, Truck } from 'lucide-react';
 import { Product, Category } from '../types/index.ts';
 import { api } from '../services/api.ts';
 import { ProductCard } from '../components/product/ProductCard.tsx';
@@ -12,7 +12,6 @@ export const HomePage: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [bestSellers, setBestSellers] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [activeTab, setActiveTab] = useState<'all' | 'formal' | 'casual' | 'party'>('all');
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -42,66 +41,93 @@ export const HomePage: React.FC = () => {
     loadHomeData();
   }, []);
 
-  const filterTabProducts = () => {
-    if (activeTab === 'all') return featuredProducts;
-    if (activeTab === 'formal') return featuredProducts.filter(p => p.category === 'formal-wear');
-    if (activeTab === 'casual') return featuredProducts.filter(p => p.category === 'casual-wear');
-    if (activeTab === 'party') return featuredProducts.filter(p => p.category === 'party-wear');
-    return featuredProducts;
-  };
-
-  const fabrics = [
-    { name: 'Chiffon', image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=600&auto=format&fit=crop', desc: 'Diaphanous & Graceful' },
-    { name: 'Lawn', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600&auto=format&fit=crop', desc: 'Breathable 80/80 Cotton' },
-    { name: 'Organza', image: 'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=600&auto=format&fit=crop', desc: 'Structured Radiance' },
-    { name: 'Silk', image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=600&auto=format&fit=crop', desc: 'Pure Korean Raw Silk' },
-    { name: 'Velvet', image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=600&auto=format&fit=crop', desc: '9000 Micro Velvet' },
-    { name: 'Cotton', image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=600&auto=format&fit=crop', desc: 'Everyday Luxury' }
+  const categoryCards = [
+    {
+      title: 'New Arrivals',
+      sub: 'Latest 2026 Drops',
+      link: '/shop?category=new-arrivals',
+      img: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800&auto=format&fit=crop'
+    },
+    {
+      title: 'Balochi Dresses',
+      sub: 'Hand-Made Doch Pieces',
+      link: '/shop?category=balochi-dress',
+      img: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=800&auto=format&fit=crop'
+    },
+    {
+      title: 'Bridal Balochi',
+      sub: 'Regal Trousseau Ensembles',
+      link: '/shop?category=bridal-couture',
+      img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop'
+    },
+    {
+      title: 'Party Wear',
+      sub: 'Embroidered Velvet & Silk',
+      link: '/shop?category=party-wear',
+      img: 'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=800&auto=format&fit=crop'
+    },
+    {
+      title: 'Casual Balochi',
+      sub: 'Pure Lawn & Cotton Pret',
+      link: '/shop?category=casual-wear',
+      img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop'
+    },
+    {
+      title: 'Sale / Last Chance',
+      sub: 'Up to 30% Off Clearance',
+      link: '/shop?category=sale',
+      img: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=800&auto=format&fit=crop'
+    }
   ];
 
   return (
-    <div className="min-h-screen bg-[#FCFAF7]">
+    <div className="min-h-screen bg-[#FAF6EE] font-body text-[#3D3D3D]">
       <SEO
-        title="SK Brands | Luxury Pakistani Fashion, Pret & Embroidered Suits"
-        description="Shop signature 3-piece embroidered chiffon, festive lawn, organza, silk, and bridal couture from SK Brands. Worldwide shipping available."
+        title="SK Brand Sami Khan | Hand-Made Balochi Dresses & Luxury Pakistani Couture"
+        description="Shop authentic hand-made Balochi Doch dresses, embroidered suits, and fine pret by Sami Khan, Liaqat Bazaar, Quetta. Shipping worldwide."
       />
 
-      {/* 1. Hero Section */}
-      <section className="relative h-[82vh] min-h-[580px] max-h-[820px] w-full flex items-center justify-center overflow-hidden bg-stone-900">
+      {/* 1. Hero Section (Moody photo with dark navy overlay) */}
+      <section className="relative h-[85vh] min-h-[580px] max-h-[820px] w-full flex items-center justify-center overflow-hidden bg-[#14213D]">
         <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=2000&auto=format&fit=crop"
-            alt="SK Brands Luxury Pakistani Fashion"
-            className="w-full h-full object-cover object-center opacity-70 filter brightness-90 transform scale-102 transition-transform duration-1000"
+            alt="SK Brand Balochi Couture"
+            className="w-full h-full object-cover object-center opacity-45 filter brightness-95"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#14213D]/95 via-[#14213D]/65 to-[#14213D]/40" />
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center text-white space-y-6">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-[11px] tracking-[0.3em] uppercase text-[#F5B016] border border-white/20 font-medium">
-            <Sparkles className="w-3.5 h-3.5" />
-            Autumn / Festive Couture 2026
-          </span>
+          {/* Navy Pill Badge with Gold Text */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#14213D]/90 border border-[#F2B705]/50 text-[#F2B705] text-xs font-bold tracking-[0.25em] uppercase font-heading shadow-md backdrop-blur-md">
+            <span>✦</span>
+            AUTUMN / FESTIVE BALOCHI COUTURE 2026
+          </div>
 
-          <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-light tracking-tight leading-tight uppercase">
-            TIMELESS STYLE. <br />
-            <span className="italic font-normal text-[#F4ECE1]">MODERN ELEGANCE.</span>
+          {/* Huge Heading */}
+          <h1 className="font-heading text-[32px] sm:text-[44px] md:text-[54px] lg:text-[58px] font-black tracking-tight leading-[1.12] uppercase text-white">
+            HAND-MADE BALOCHI DOCH. <br />
+            <span className="text-[#F2B705]">TIMELESS ELEGANCE.</span>
           </h1>
 
-          <p className="max-w-xl mx-auto text-sm sm:text-base text-stone-200 font-light tracking-wide leading-relaxed">
-            Discover carefully selected fashion designed for every occasion. Masterfully embroidered silhouettes woven for discerning women worldwide.
+          {/* Body Description */}
+          <p className="max-w-xl mx-auto text-sm sm:text-base text-stone-200 font-normal leading-[1.55]">
+            Handcrafted with heirloom Balochi needlecraft by Sami Khan atelier in Liaqat Bazaar, Quetta. Delivered with express courier tracking worldwide.
           </p>
 
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+          {/* Two Buttons: Gold + White-Outlined */}
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 font-heading">
             <Link
-              to="/shop"
-              className="w-full sm:w-auto px-8 py-3.5 bg-white text-stone-900 hover:bg-[#F3EFEA] text-xs tracking-[0.2em] uppercase font-bold transition-all shadow-lg rounded"
+              to="/shop?category=balochi-dress"
+              className="w-full sm:w-auto px-8 py-3.5 bg-[#F2B705] hover:bg-[#D9A404] text-[#14213D] text-sm sm:text-base font-extrabold tracking-wider uppercase transition-all shadow-xl rounded-xl flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
             >
-              SHOP COLLECTION
+              SHOP BALOCHI DRESSES
+              <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               to="/shop?category=new-arrivals"
-              className="w-full sm:w-auto px-8 py-3.5 bg-transparent text-white hover:bg-white/10 border border-white/80 text-xs tracking-[0.2em] uppercase font-bold transition-all rounded backdrop-blur-xs"
+              className="w-full sm:w-auto px-8 py-3.5 bg-transparent text-white hover:bg-white/15 border-2 border-white text-sm sm:text-base font-extrabold tracking-wider uppercase transition-all rounded-xl backdrop-blur-xs flex items-center justify-center"
             >
               NEW ARRIVALS
             </Link>
@@ -109,94 +135,69 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Trust Badges */}
+      {/* 2. USP Strip (Hand-Made Embroidery · Worldwide DHL Delivery · WhatsApp Ordering · Custom Sizing) */}
       <section className="bg-white border-y border-stone-200 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div className="flex flex-col items-center p-2">
-              <Globe className="w-5 h-5 text-[#F5B016] mb-2" />
-              <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900">Worldwide Shipping</h4>
-              <p className="text-[11px] text-stone-500">Express courier delivery to UK, USA, UAE & beyond</p>
+              <Scissors className="w-6 h-6 text-[#F2B705] mb-2" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#14213D] font-heading">Hand-Made Embroidery</h4>
+              <p className="text-[12px] text-stone-500 mt-0.5">Authentic Balochi Doch, mirror work & needlecraft</p>
             </div>
             <div className="flex flex-col items-center p-2">
-              <Award className="w-5 h-5 text-[#F5B016] mb-2" />
-              <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900">Artisan Craftsmanship</h4>
-              <p className="text-[11px] text-stone-500">Authentic hand embroidery, zardozi & fine fabrics</p>
+              <Truck className="w-6 h-6 text-[#14213D] mb-2" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#14213D] font-heading">Worldwide DHL Delivery</h4>
+              <p className="text-[12px] text-stone-500 mt-0.5">Express tracked delivery to UK, USA, UAE & Canada</p>
             </div>
             <div className="flex flex-col items-center p-2">
-              <Shield className="w-5 h-5 text-[#F5B016] mb-2" />
-              <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900">Secure Order Process</h4>
-              <p className="text-[11px] text-stone-500">Bank transfer verification & WhatsApp concierge</p>
+              <MessageCircle className="w-6 h-6 text-[#25D366] mb-2" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#14213D] font-heading">WhatsApp Ordering</h4>
+              <p className="text-[12px] text-stone-500 mt-0.5">Direct chat with concierge on 0316 0367456</p>
             </div>
             <div className="flex flex-col items-center p-2">
-              <Sparkles className="w-5 h-5 text-[#F5B016] mb-2" />
-              <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900">Styling Consultation</h4>
-              <p className="text-[11px] text-stone-500">Custom size advice via 1-on-1 stylist chat</p>
+              <Ruler className="w-6 h-6 text-[#F2B705] mb-2" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#14213D] font-heading">Custom Sizing</h4>
+              <p className="text-[12px] text-stone-500 mt-0.5">Made-to-measure tailored to your exact fit</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. Featured Collections Cards */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+      {/* 3. Category Grid (6 Image Cards) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-semibold tracking-[0.25em] text-[#F5B016] uppercase block mb-1">
-            Curated Categories
+          <span className="text-xs font-extrabold tracking-[0.25em] text-[#F2B705] uppercase block mb-1 font-heading">
+            Heirloom & Festive Wear
           </span>
-          <h2 className="font-display text-3xl sm:text-4xl font-normal text-stone-900 tracking-tight">
-            Featured Collections
+          <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#14213D] tracking-tight">
+            Explore Collections
           </h2>
-          <div className="w-12 h-0.5 bg-[#F5B016] mx-auto mt-3" />
+          <div className="w-16 h-1 bg-[#F2B705] mx-auto mt-3 rounded-full" />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            {
-              title: 'NEW ARRIVALS',
-              sub: 'Seasonal Highlights',
-              link: '/shop?category=new-arrivals',
-              img: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800&auto=format&fit=crop'
-            },
-            {
-              title: 'FORMAL WEAR',
-              sub: 'Wedding & Evening Couture',
-              link: '/shop?category=formal-wear',
-              img: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=800&auto=format&fit=crop'
-            },
-            {
-              title: 'CASUAL WEAR',
-              sub: 'Festive Everyday Lawn',
-              link: '/shop?category=casual-wear',
-              img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop'
-            },
-            {
-              title: 'PARTY WEAR',
-              sub: 'Embroidered Ensembles',
-              link: '/shop?category=party-wear',
-              img: 'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=800&auto=format&fit=crop'
-            }
-          ].map((col) => (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+          {categoryCards.map((col) => (
             <Link
               key={col.title}
               to={col.link}
-              className="group relative h-96 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+              className="group relative h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-md block bg-stone-950 border border-stone-200"
             >
               <img
                 src={col.img}
                 alt={col.title}
-                className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-108"
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 opacity-85"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-              <div className="absolute bottom-6 inset-x-6 text-white text-center">
-                <span className="text-[10px] tracking-[0.2em] text-[#F5B016] uppercase font-semibold block mb-1">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
+              <div className="absolute bottom-5 left-5 right-5 text-white space-y-1">
+                <span className="text-[11px] tracking-[0.2em] text-[#F2B705] uppercase font-bold block font-heading">
                   {col.sub}
                 </span>
-                <h3 className="font-display text-xl font-bold tracking-wider mb-3">
+                <h3 className="font-heading text-lg sm:text-xl font-bold tracking-tight">
                   {col.title}
                 </h3>
-                <span className="inline-flex items-center gap-1.5 text-xs tracking-widest uppercase font-semibold text-white/90 group-hover:text-[#F5B016] transition-colors border-b border-white/40 pb-0.5">
-                  Explore Collection
-                  <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                <span className="inline-flex items-center gap-1.5 text-xs tracking-wider uppercase font-bold text-[#F2B705] group-hover:text-white transition-colors pt-1">
+                  Shop Now
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </div>
             </Link>
@@ -204,160 +205,28 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. Featured Products Grid (8 products with tabs) */}
-      <section className="bg-stone-50 py-16 sm:py-24 border-y border-stone-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
-            <div>
-              <span className="text-xs font-semibold tracking-[0.25em] text-[#F5B016] uppercase block mb-1">
-                Handcrafted Pret
-              </span>
-              <h2 className="font-display text-3xl sm:text-4xl font-normal text-stone-900 tracking-tight">
-                Featured Products
-              </h2>
-            </div>
-
-            {/* Category Filter Tabs */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 text-xs font-medium">
-              {[
-                { id: 'all', label: 'All Picks' },
-                { id: 'formal', label: 'Formal Wear' },
-                { id: 'casual', label: 'Casual Lawn' },
-                { id: 'party', label: 'Party Ensembles' }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`px-4 py-2 rounded-full transition-all whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? 'bg-stone-900 text-white font-semibold shadow-xs'
-                      : 'bg-white text-stone-600 hover:text-black hover:bg-stone-200/60 border border-stone-200'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Product Grid: 4 per row desktop, 3 tablet, 2 mobile */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {filterTabProducts().map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onQuickView={(p) => setQuickViewProduct(p)}
-              />
-            ))}
-          </div>
-
-          <div className="mt-12 text-center">
-            <Link
-              to="/shop"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-stone-900 hover:bg-black text-white text-xs tracking-[0.2em] uppercase font-bold rounded shadow transition-all hover:scale-102"
-            >
-              View Full Collection
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. Shop by Fabric Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-semibold tracking-[0.25em] text-[#F5B016] uppercase block mb-1">
-            Artisanal Weaves
-          </span>
-          <h2 className="font-display text-3xl sm:text-4xl font-normal text-stone-900 tracking-tight">
-            Shop By Fabric
-          </h2>
-          <p className="text-xs text-stone-500 mt-2">
-            Each textile selected for superior drape, breathability, and rich embroidery retention.
-          </p>
-          <div className="w-12 h-0.5 bg-[#F5B016] mx-auto mt-3" />
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {fabrics.map((fabric) => (
-            <Link
-              key={fabric.name}
-              to={`/shop?fabric=${fabric.name}`}
-              className="group flex flex-col items-center bg-white p-3 rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all text-center"
-            >
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden mb-3 border-2 border-stone-100 group-hover:border-[#F5B016] transition-colors">
-                <img
-                  src={fabric.image}
-                  alt={fabric.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-              </div>
-              <h4 className="font-display text-base font-bold text-stone-900 group-hover:text-[#F5B016] transition-colors">
-                {fabric.name}
-              </h4>
-              <p className="text-[10px] text-stone-400 mt-0.5 leading-tight">
-                {fabric.desc}
-              </p>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* 5. Promotional Banner */}
-      <section className="relative py-24 bg-stone-950 text-white overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1800&auto=format&fit=crop"
-            alt="Editorial Pret Banner"
-            className="w-full h-full object-cover object-center opacity-40 filter brightness-90"
-          />
-          <div className="absolute inset-0 bg-stone-950/70" />
-        </div>
-
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center space-y-6">
-          <span className="text-xs font-semibold tracking-[0.3em] uppercase text-[#F5B016] block">
-            Signature Pret & Bridal Line
-          </span>
-          <h2 className="font-display text-3xl sm:text-5xl font-light tracking-wide uppercase leading-tight">
-            "YOUR STYLE. YOUR STATEMENT."
-          </h2>
-          <p className="max-w-lg mx-auto text-stone-300 text-xs sm:text-sm font-light leading-relaxed">
-            Crafted with passion in Lahore, Pakistan. Tailored with meticulous needlework, delicate scallop lace trims, and regal organza dupattas.
-          </p>
-          <div className="pt-2">
-            <Link
-              to="/shop"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#F5B016] hover:bg-[#E5A00D] text-black text-xs tracking-[0.2em] uppercase font-bold rounded shadow transition-all hover:scale-102"
-            >
-              SHOP NOW
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. Best Sellers Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+      {/* 4. Featured Products Grid (4 Columns, Product Card match ukfashions.pk) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="flex items-center justify-between mb-10">
           <div>
-            <span className="text-xs font-semibold tracking-[0.25em] text-[#F5B016] uppercase block mb-1">
-              Customer Favorites
+            <span className="text-xs font-extrabold tracking-[0.25em] text-[#F2B705] uppercase block mb-1 font-heading">
+              Signature Creations
             </span>
-            <h2 className="font-display text-3xl sm:text-4xl font-normal text-stone-900 tracking-tight">
-              Best Sellers
+            <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#14213D] tracking-tight">
+              Featured Balochi Dresses
             </h2>
           </div>
           <Link
-            to="/shop?sort=best-selling"
-            className="text-xs font-semibold tracking-wider text-[#F5B016] hover:text-black uppercase flex items-center gap-1 transition-colors"
+            to="/shop"
+            className="text-xs sm:text-sm font-bold tracking-wider text-[#14213D] hover:text-[#F2B705] uppercase flex items-center gap-1 transition-colors font-heading"
           >
-            View All
-            <ChevronRight className="w-4 h-4" />
+            View All ({featuredProducts.length})
+            <ChevronRight className="w-4 h-4 text-[#F2B705]" />
           </Link>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {bestSellers.slice(0, 4).map((product) => (
+          {featuredProducts.slice(0, 8).map((product) => (
             <ProductCard
               key={product.id}
               product={product}
@@ -367,38 +236,103 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 7. Brand Story Section */}
+      {/* 5. Two-Tile Banner Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Left Tile — Fashion Model on Teal/Blue with Heritage Link */}
+          <div className="relative h-80 sm:h-96 rounded-2xl overflow-hidden bg-[#1D3557] flex items-end p-8 text-white shadow-lg border border-stone-200">
+            <img
+              src="https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=900&auto=format&fit=crop"
+              alt="Balochi Heritage"
+              className="absolute inset-0 w-full h-full object-cover opacity-50"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#14213D]/95 via-[#1D3557]/60 to-transparent" />
+            <div className="relative z-10 space-y-3">
+              <span className="text-xs font-bold tracking-[0.25em] text-[#F2B705] uppercase font-heading">
+                Centuries of Tradition
+              </span>
+              <h3 className="font-heading text-2xl sm:text-3xl font-bold leading-tight">
+                Hand-Crafted in Quetta by Master Artisans
+              </h3>
+              <p className="text-xs sm:text-sm text-stone-200 font-normal max-w-sm">
+                Every doch stitch represents the soul of Balochistan cultural craftsmanship.
+              </p>
+              <div>
+                <Link
+                  to="/about"
+                  className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-[#F2B705] hover:text-white border-b-2 border-[#F2B705] pb-1 transition-colors font-heading"
+                >
+                  READ OUR HERITAGE STORY
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Tile — Boutique / Festive Scene with Gold Button */}
+          <div className="relative h-80 sm:h-96 rounded-2xl overflow-hidden bg-[#14213D] flex items-end p-8 text-white shadow-lg border border-stone-200">
+            <img
+              src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=900&auto=format&fit=crop"
+              alt="Festive Balochi Couture"
+              className="absolute inset-0 w-full h-full object-cover opacity-50"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#14213D]/95 via-[#14213D]/60 to-transparent" />
+            <div className="relative z-10 space-y-3">
+              <span className="text-xs font-bold tracking-[0.25em] text-[#F2B705] uppercase font-heading">
+                Liaqat Bazaar Quetta
+              </span>
+              <h3 className="font-heading text-2xl sm:text-3xl font-bold leading-tight">
+                Festive & Bridal Balochi Collection 2026
+              </h3>
+              <p className="text-xs sm:text-sm text-stone-200 font-normal max-w-sm">
+                Tailored with fine shamoz silk, pure chiffon, and micro velvet.
+              </p>
+              <div>
+                <Link
+                  to="/shop?category=balochi-dress"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#F2B705] hover:bg-[#D9A404] text-[#14213D] font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all font-heading"
+                >
+                  VIEW BALOCHI DRESSES
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Brand Story Section featuring Signboard Pill Logo */}
       <section className="bg-white py-16 sm:py-24 border-t border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <div className="flex items-center gap-3">
-                <SKBrandLogo size="md" showText={true} />
+                <SKBrandLogo size="lg" />
               </div>
-              <span className="text-xs font-semibold tracking-[0.25em] text-[#F5B016] uppercase block">
-                Artisan Heritage â€¢ Liaqat Bazaar Quetta
+              <span className="text-xs font-extrabold tracking-[0.25em] text-[#F2B705] uppercase block font-heading">
+                Artisan Heritage • Liaqat Bazaar Quetta
               </span>
-              <h2 className="font-display text-3xl sm:text-4xl text-stone-950 font-normal leading-tight">
+              <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl text-[#14213D] font-extrabold leading-tight">
                 Authentic Balochi Doch Needlecraft Curated by Sami Khan
               </h2>
-              <div className="w-12 h-0.5 bg-[#F5B016]" />
-              <p className="text-stone-600 text-sm leading-relaxed">
-                Founded in Quetta by <strong>Sami Khan</strong>, SK Brand preserves centuries of heirloom needlecraft. Located at Naseem Fashion Mall, Liaqat Bazaar, our atelier specializes in hand-embroidered <strong>Balochi Doch (Doz)</strong> dresses, mirror embellishments, and luxury machine embroidery suits tailored on fine grip silk, festive lawn, and micro velvet.
+              <div className="w-16 h-1 bg-[#F2B705] rounded-full" />
+              <p className="text-[#3D3D3D] text-sm sm:text-base leading-relaxed">
+                Founded in Quetta by <strong className="text-[#14213D]">Sami Khan</strong>, SK Brand preserves centuries of heirloom needlecraft. Located at Naseem Fashion Mall, Liaqat Bazaar, our atelier specializes in hand-embroidered <strong className="text-[#14213D]">Balochi Doch (Doz)</strong> dresses, mirror embellishments, and luxury machine embroidery suits.
               </p>
-              <p className="text-stone-600 text-sm leading-relaxed">
-                Whether shopping for a signature traditional Balochi ensemble or contemporary seasonal pret, every garment is crafted with timeless devotion and delivered with express DHL courier tracking to London, Manchester, New York, Toronto, and worldwide.
+              <p className="text-[#3D3D3D] text-sm sm:text-base leading-relaxed">
+                Whether shopping for a traditional Balochi ensemble or contemporary seasonal pret, every garment is crafted with timeless devotion and delivered with express DHL courier tracking to London, Manchester, New York, Toronto, and worldwide.
               </p>
-              <div className="pt-2 flex items-center gap-4 flex-wrap">
+              <div className="pt-2 flex items-center gap-4 flex-wrap font-heading">
                 <Link
                   to="/about"
-                  className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.18em] uppercase text-stone-900 hover:text-[#F5B016] transition-colors border-b-2 border-stone-900 pb-1"
+                  className="inline-flex items-center gap-2 text-xs sm:text-sm font-extrabold tracking-wider uppercase text-[#14213D] hover:text-[#F2B705] transition-colors border-b-2 border-[#14213D] pb-1"
                 >
                   Read Our Heritage Story
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
                 <Link
                   to="/shop?category=balochi-dress"
-                  className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.18em] uppercase text-[#F5B016] hover:text-black transition-colors border-b-2 border-[#F5B016] pb-1"
+                  className="inline-flex items-center gap-2 text-xs sm:text-sm font-extrabold tracking-wider uppercase bg-[#F2B705] text-[#14213D] px-5 py-2.5 rounded-xl hover:bg-[#D9A404] transition-colors shadow-md"
                 >
                   View Balochi Dresses
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -410,12 +344,12 @@ export const HomePage: React.FC = () => {
               <img
                 src="https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=800&auto=format&fit=crop"
                 alt="Pakistani Craftsmanship"
-                className="w-full h-72 sm:h-80 object-cover rounded-lg shadow-md"
+                className="w-full h-72 sm:h-80 object-cover rounded-2xl shadow-md border border-stone-200"
               />
               <img
                 src="https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=800&auto=format&fit=crop"
                 alt="Embroidery Needlework"
-                className="w-full h-72 sm:h-80 object-cover rounded-lg shadow-md mt-6"
+                className="w-full h-72 sm:h-80 object-cover rounded-2xl shadow-md mt-6 border border-stone-200"
               />
             </div>
           </div>
@@ -430,4 +364,3 @@ export const HomePage: React.FC = () => {
     </div>
   );
 };
-

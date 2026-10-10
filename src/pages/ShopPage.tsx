@@ -1,5 +1,5 @@
-﻿import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Filter, X, ChevronDown, Check, SlidersHorizontal, RotateCcw, Loader2 } from 'lucide-react';
 import { Product, Facets, Pagination } from '../types/index.ts';
 import { api } from '../services/api.ts';
@@ -10,12 +10,11 @@ import { formatPrice } from '../utils/formatters.ts';
 
 export const ShopPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
-    limit: 12,
+    limit: 16,
     total: 0,
     totalPages: 1,
     hasNextPage: false,
@@ -26,7 +25,7 @@ export const ShopPage: React.FC = () => {
     colors: [],
     sizes: [],
     minPrice: 0,
-    maxPrice: 20000
+    maxPrice: 17000
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -41,8 +40,8 @@ export const ShopPage: React.FC = () => {
   const currentInStock = searchParams.get('inStock') || 'all';
   const currentSort = searchParams.get('sort') || 'featured';
   const currentSearch = searchParams.get('search') || '';
-  const currentMinPrice = searchParams.get('minPrice') || '';
-  const currentMaxPrice = searchParams.get('maxPrice') || '';
+  const currentMinPrice = searchParams.get('minPrice') || '0';
+  const currentMaxPrice = searchParams.get('maxPrice') || '17000';
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
   // Fetch products whenever params change
@@ -52,7 +51,7 @@ export const ShopPage: React.FC = () => {
       try {
         const query: Record<string, any> = {
           page: currentPage,
-          limit: 12,
+          limit: 16,
           sort: currentSort
         };
 
@@ -62,8 +61,8 @@ export const ShopPage: React.FC = () => {
         if (currentSize !== 'all') query.size = currentSize;
         if (currentInStock !== 'all') query.inStock = currentInStock;
         if (currentSearch) query.search = currentSearch;
-        if (currentMinPrice) query.minPrice = currentMinPrice;
-        if (currentMaxPrice) query.maxPrice = currentMaxPrice;
+        if (currentMinPrice && currentMinPrice !== '0') query.minPrice = currentMinPrice;
+        if (currentMaxPrice && currentMaxPrice !== '17000') query.maxPrice = currentMaxPrice;
 
         const res = await api.getProducts(query);
         if (res.success) {
@@ -100,7 +99,7 @@ export const ShopPage: React.FC = () => {
     } else {
       next.set(key, value);
     }
-    next.set('page', '1'); // Reset to page 1 on filter change
+    next.set('page', '1');
     setSearchParams(next);
   };
 
@@ -115,94 +114,365 @@ export const ShopPage: React.FC = () => {
     currentSize !== 'all' ||
     currentInStock !== 'all' ||
     currentSearch !== '' ||
-    currentMinPrice !== '' ||
-    currentMaxPrice !== '';
+    (currentMinPrice !== '0' && currentMinPrice !== '') ||
+    (currentMaxPrice !== '17000' && currentMaxPrice !== '');
 
+  // UKFashions.pk style category taxonomy
   const categoriesList = [
-    { label: 'All Collections', value: 'all' },
+    { label: 'All Balochi Dresses', value: 'all' },
+    { label: 'Balochi Doch Hand-Made', value: 'balochi-dress' },
     { label: 'New Arrivals', value: 'new-arrivals' },
-    { label: 'Formal Wear', value: 'formal-wear' },
-    { label: 'Casual Wear', value: 'casual-wear' },
+    { label: 'Bridal Balochi', value: 'bridal-couture' },
     { label: 'Party Wear', value: 'party-wear' },
-    { label: 'Luxury Pret', value: 'luxury-pret' },
-    { label: 'Bridal Couture', value: 'bridal-couture' }
+    { label: 'Casual Balochi', value: 'casual-wear' },
+    { label: 'Winter Collection', value: 'winter-collection' },
+    { label: 'Sale / Last Chance', value: 'sale' }
   ];
 
+  // UKFashions.pk style fabric list
   const fabricsList = [
-    'Cotton',
-    'Lawn',
+    'Balochi Hand Embroidery',
+    'Silk',
+    'Shamoz Silk',
+    'Velvet',
     'Chiffon',
     'Organza',
-    'Silk',
-    'Velvet'
+    'Pure Lawn',
+    'Cotton',
+    'Net',
+    'Bona Dora'
   ];
 
-  const sizesList = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Unstitched'];
+  // UKFashions.pk style color swatches
+  const colorSwatches = [
+    { name: 'Beige', hex: '#D9C5B2' },
+    { name: 'Black', hex: '#000000' },
+    { name: 'Blue', hex: '#2563EB' },
+    { name: 'Gold', hex: '#F2B705' },
+    { name: 'Green', hex: '#16A34A' },
+    { name: 'Maroon', hex: '#800000' },
+    { name: 'Navy', hex: '#14213D' },
+    { name: 'Orange', hex: '#EA580C' },
+    { name: 'Pink', hex: '#EC4899' },
+    { name: 'Purple', hex: '#9333EA' },
+    { name: 'Red', hex: '#C1272D' },
+    { name: 'White', hex: '#FFFFFF' },
+    { name: 'Yellow', hex: '#FACC15' }
+  ];
+
+  const sizesList = [
+    'Free Size',
+    'S',
+    'M',
+    'L',
+    'XL',
+    'Custom'
+  ];
 
   const sortOptions = [
     { label: 'Featured', value: 'featured' },
-    { label: 'Most Relevant', value: 'featured' },
-    { label: 'Best Selling', value: 'best-selling' },
-    { label: 'Alphabetically: A-Z', value: 'a-z' },
-    { label: 'Alphabetically: Z-A', value: 'z-a' },
-    { label: 'Price: Low to High', value: 'price-low' },
-    { label: 'Price: High to Low', value: 'price-high' },
-    { label: 'Date: New to Old', value: 'newest' },
-    { label: 'Date: Old to New', value: 'oldest' }
+    { label: 'Best selling', value: 'best-selling' },
+    { label: 'Alphabetically A–Z', value: 'a-z' },
+    { label: 'Alphabetically Z–A', value: 'z-a' },
+    { label: 'Price low→high', value: 'price-low' },
+    { label: 'Price high→low', value: 'price-high' },
+    { label: 'Date old→new', value: 'oldest' },
+    { label: 'Date new→old', value: 'newest' }
   ];
 
   const getPageTitle = () => {
     if (currentSearch) return `Search Results for "${currentSearch}"`;
     if (currentCategory !== 'all') {
       const match = categoriesList.find(c => c.value === currentCategory);
-      return match ? match.label : 'Collection';
+      return match ? match.label : 'Balochi Collection';
     }
-    if (currentFabric !== 'all') return `${currentFabric} Collection`;
-    return 'All Products';
+    if (currentFabric !== 'all') return `${currentFabric} Dresses`;
+    return 'All Balochi Dresses';
   };
 
+  const renderFiltersSidebar = () => (
+    <div className="space-y-6 font-body text-sm">
+      {/* Active Filter Tags */}
+      {hasActiveFilters && (
+        <div className="p-4 bg-[#FAF6EE] rounded-xl border border-stone-200">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#14213D] font-heading">
+              Active Filters
+            </span>
+            <button
+              onClick={clearAllFilters}
+              className="text-xs font-bold text-[#C1272D] hover:underline flex items-center gap-1"
+            >
+              <RotateCcw className="w-3 h-3" />
+              Clear all
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {currentCategory !== 'all' && (
+              <span className="inline-flex items-center gap-1 text-xs bg-white px-2.5 py-1 rounded-full border border-stone-300 font-bold text-[#14213D]">
+                {currentCategory}
+                <X className="w-3 h-3 cursor-pointer" onClick={() => updateParam('category', 'all')} />
+              </span>
+            )}
+            {currentFabric !== 'all' && (
+              <span className="inline-flex items-center gap-1 text-xs bg-white px-2.5 py-1 rounded-full border border-stone-300 font-bold text-[#14213D]">
+                {currentFabric}
+                <X className="w-3 h-3 cursor-pointer" onClick={() => updateParam('fabric', 'all')} />
+              </span>
+            )}
+            {currentColor !== 'all' && (
+              <span className="inline-flex items-center gap-1 text-xs bg-white px-2.5 py-1 rounded-full border border-stone-300 font-bold text-[#14213D]">
+                {currentColor}
+                <X className="w-3 h-3 cursor-pointer" onClick={() => updateParam('color', 'all')} />
+              </span>
+            )}
+            {currentSize !== 'all' && (
+              <span className="inline-flex items-center gap-1 text-xs bg-white px-2.5 py-1 rounded-full border border-stone-300 font-bold text-[#14213D]">
+                Size: {currentSize}
+                <X className="w-3 h-3 cursor-pointer" onClick={() => updateParam('size', 'all')} />
+              </span>
+            )}
+            {currentInStock !== 'all' && (
+              <span className="inline-flex items-center gap-1 text-xs bg-white px-2.5 py-1 rounded-full border border-stone-300 font-bold text-[#14213D]">
+                {currentInStock === 'true' ? 'In stock' : 'Out of stock'}
+                <X className="w-3 h-3 cursor-pointer" onClick={() => updateParam('inStock', 'all')} />
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 1. Price Filter (Min-Max Slider & "The highest price is Rs. 17,000") */}
+      <div className="pb-5 border-b border-stone-200">
+        <h3 className="font-heading font-bold text-sm uppercase tracking-wider text-[#14213D] mb-2">
+          Price
+        </h3>
+        <p className="text-xs text-stone-500 mb-3">
+          The highest price is <strong className="text-[#14213D]">Rs. 17,000</strong>
+        </p>
+        <div className="flex items-center gap-2">
+          <div className="flex-1">
+            <label className="text-[10px] text-stone-500 uppercase font-bold block mb-1">From</label>
+            <div className="flex items-center bg-white border border-stone-300 rounded-lg px-2.5 py-1.5 focus-within:border-[#F2B705]">
+              <span className="text-xs text-stone-400 mr-1">Rs.</span>
+              <input
+                type="number"
+                min="0"
+                max="17000"
+                value={currentMinPrice}
+                onChange={(e) => updateParam('minPrice', e.target.value)}
+                placeholder="0"
+                className="w-full text-xs text-[#14213D] font-bold focus:outline-none"
+              />
+            </div>
+          </div>
+          <span className="text-stone-400 mt-4">-</span>
+          <div className="flex-1">
+            <label className="text-[10px] text-stone-500 uppercase font-bold block mb-1">To</label>
+            <div className="flex items-center bg-white border border-stone-300 rounded-lg px-2.5 py-1.5 focus-within:border-[#F2B705]">
+              <span className="text-xs text-stone-400 mr-1">Rs.</span>
+              <input
+                type="number"
+                min="0"
+                max="17000"
+                value={currentMaxPrice}
+                onChange={(e) => updateParam('maxPrice', e.target.value)}
+                placeholder="17000"
+                className="w-full text-xs text-[#14213D] font-bold focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Availability (In stock / Out of stock) */}
+      <div className="pb-5 border-b border-stone-200">
+        <h3 className="font-heading font-bold text-sm uppercase tracking-wider text-[#14213D] mb-3">
+          Availability
+        </h3>
+        <div className="space-y-2">
+          <label className="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-stone-700 hover:text-black">
+            <input
+              type="radio"
+              name="inStockFilter"
+              checked={currentInStock === 'all'}
+              onChange={() => updateParam('inStock', 'all')}
+              className="w-4 h-4 accent-[#14213D]"
+            />
+            <span>All Items</span>
+          </label>
+          <label className="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-stone-700 hover:text-black">
+            <input
+              type="radio"
+              name="inStockFilter"
+              checked={currentInStock === 'true'}
+              onChange={() => updateParam('inStock', 'true')}
+              className="w-4 h-4 accent-[#14213D]"
+            />
+            <span>In stock</span>
+          </label>
+          <label className="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-stone-700 hover:text-black">
+            <input
+              type="radio"
+              name="inStockFilter"
+              checked={currentInStock === 'false'}
+              onChange={() => updateParam('inStock', 'false')}
+              className="w-4 h-4 accent-[#14213D]"
+            />
+            <span>Out of stock</span>
+          </label>
+        </div>
+      </div>
+
+      {/* 3. Fabric Filter */}
+      <div className="pb-5 border-b border-stone-200">
+        <h3 className="font-heading font-bold text-sm uppercase tracking-wider text-[#14213D] mb-3">
+          Fabric
+        </h3>
+        <div className="space-y-2 max-h-56 overflow-y-auto pr-2">
+          <button
+            onClick={() => updateParam('fabric', 'all')}
+            className={`flex items-center justify-between w-full text-left text-xs font-semibold py-1 px-2 rounded-md ${
+              currentFabric === 'all' ? 'bg-[#F2B705] text-[#14213D] font-extrabold' : 'text-stone-700 hover:bg-stone-100'
+            }`}
+          >
+            <span>All Fabrics</span>
+            {currentFabric === 'all' && <Check className="w-3.5 h-3.5" />}
+          </button>
+          {fabricsList.map((fab) => {
+            const isSelected = currentFabric.toLowerCase() === fab.toLowerCase();
+            return (
+              <button
+                key={fab}
+                onClick={() => updateParam('fabric', isSelected ? 'all' : fab)}
+                className={`flex items-center justify-between w-full text-left text-xs font-semibold py-1.5 px-2 rounded-md transition-colors ${
+                  isSelected ? 'bg-[#F2B705] text-[#14213D] font-extrabold shadow-xs' : 'text-stone-700 hover:bg-stone-100'
+                }`}
+              >
+                <span>{fab}</span>
+                {isSelected && <Check className="w-3.5 h-3.5" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 4. Color Swatches */}
+      <div className="pb-5 border-b border-stone-200">
+        <h3 className="font-heading font-bold text-sm uppercase tracking-wider text-[#14213D] mb-3">
+          Color
+        </h3>
+        <div className="grid grid-cols-4 gap-2">
+          {colorSwatches.map((color) => {
+            const isSelected = currentColor.toLowerCase() === color.name.toLowerCase();
+            return (
+              <button
+                key={color.name}
+                onClick={() => updateParam('color', isSelected ? 'all' : color.name)}
+                className={`flex flex-col items-center p-1.5 rounded-lg border transition-all ${
+                  isSelected
+                    ? 'border-[#14213D] bg-[#F2B705]/20 shadow-xs'
+                    : 'border-transparent hover:border-stone-300'
+                }`}
+                title={color.name}
+              >
+                <span
+                  className="w-5 h-5 rounded-full border border-stone-300 shadow-xs block relative"
+                  style={{ backgroundColor: color.hex }}
+                >
+                  {isSelected && (
+                    <Check className={`w-3 h-3 absolute inset-0 m-auto ${['White', 'Yellow', 'Beige'].includes(color.name) ? 'text-black' : 'text-white'}`} />
+                  )}
+                </span>
+                <span className="text-[10px] text-stone-700 mt-1 font-semibold truncate w-full text-center">
+                  {color.name}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 5. Size Chips */}
+      <div>
+        <h3 className="font-heading font-bold text-sm uppercase tracking-wider text-[#14213D] mb-3">
+          Size
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => updateParam('size', 'all')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+              currentSize === 'all'
+                ? 'bg-[#14213D] text-[#F2B705] border-[#14213D]'
+                : 'bg-white text-stone-700 border-stone-300 hover:border-stone-500'
+            }`}
+          >
+            All
+          </button>
+          {sizesList.map((sz) => {
+            const isSelected = currentSize.toLowerCase() === sz.toLowerCase();
+            return (
+              <button
+                key={sz}
+                onClick={() => updateParam('size', isSelected ? 'all' : sz)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                  isSelected
+                    ? 'bg-[#F2B705] text-[#14213D] border-[#F2B705] shadow-xs'
+                    : 'bg-white text-stone-700 border-stone-300 hover:border-stone-500'
+                }`}
+              >
+                {sz}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-[#FCFAF7] py-8 sm:py-12">
+    <div className="min-h-screen bg-[#FAF6EE] py-8 sm:py-12 font-body">
       <SEO
-        title={`${getPageTitle()} | SK Brands Luxury Pret`}
-        description="Browse SK Brands collection of premium Pakistani unstitched and stitched suits. Embroidered chiffon, lawn, organza, silk, and bridal couture."
+        title={`${getPageTitle()} | SK Brand Sami Khan Quetta`}
+        description="Shop hand-made Balochi Doch dresses, embroidered suits, and fine couture from SK Brand by Sami Khan."
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb & Header */}
+        {/* Breadcrumb & Top Bar */}
         <div className="mb-6">
-          <nav className="text-xs text-stone-500 mb-2">
-            <span>Home</span> / <span className="text-stone-900 font-semibold">{getPageTitle()}</span>
+          <nav className="text-xs text-stone-500 mb-2 font-medium">
+            <span>Home</span> / <span className="text-[#14213D] font-bold">{getPageTitle()}</span>
           </nav>
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-stone-200">
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-stone-200">
             <div>
-              <h1 className="font-display text-3xl sm:text-4xl font-normal text-stone-950">
+              <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#14213D]">
                 {getPageTitle()}
               </h1>
-              <p className="text-xs text-stone-500 mt-1">
-                Showing {products.length} of {pagination.total} luxury articles
+              {/* Product item count (e.g. "81 items") */}
+              <p className="text-xs text-stone-600 mt-1 font-semibold">
+                Showing <strong className="text-[#14213D]">{pagination.total} items</strong>
               </p>
             </div>
 
-            {/* Sort & Mobile Filter Trigger */}
+            {/* Sort Dropdown & Mobile Filter Button */}
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsMobileFilterOpen(true)}
-                className="lg:hidden flex items-center gap-2 px-4 py-2 bg-white border border-stone-300 rounded text-xs font-semibold text-stone-800 shadow-xs"
+                className="lg:hidden inline-flex items-center gap-2 px-4 py-2 bg-white border border-stone-300 rounded-lg text-xs font-bold text-[#14213D] shadow-sm font-heading"
               >
-                <SlidersHorizontal className="w-3.5 h-3.5" />
-                Filters
-                {hasActiveFilters && (
-                  <span className="w-2 h-2 rounded-full bg-[#F5B016]" />
-                )}
+                <SlidersHorizontal className="w-4 h-4 text-[#F2B705]" />
+                Filters {hasActiveFilters && '(Active)'}
               </button>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-stone-500 hidden sm:inline">Sort:</span>
+                <label className="text-xs font-bold text-stone-600 uppercase font-heading hidden sm:inline">
+                  Sort:
+                </label>
                 <select
                   value={currentSort}
                   onChange={(e) => updateParam('sort', e.target.value)}
-                  className="bg-white border border-stone-300 rounded px-3 py-2 text-xs font-medium text-stone-800 focus:outline-none focus:border-stone-500 cursor-pointer shadow-xs"
+                  className="bg-white border border-stone-300 rounded-lg px-3 py-2 text-xs font-bold text-[#14213D] focus:outline-none focus:border-[#F2B705] shadow-sm font-heading"
                 >
                   {sortOptions.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -213,305 +483,59 @@ export const ShopPage: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {/* Active Filter Chips */}
-          {hasActiveFilters && (
-            <div className="flex items-center gap-2 flex-wrap pt-4">
-              <span className="text-xs font-semibold text-stone-600">Active Filters:</span>
-
-              {currentCategory !== 'all' && (
-                <button
-                  onClick={() => updateParam('category', 'all')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-stone-200 text-stone-800 rounded-full text-xs hover:bg-stone-300 transition-colors"
-                >
-                  Category: {currentCategory}
-                  <X className="w-3 h-3" />
-                </button>
-              )}
-
-              {currentFabric !== 'all' && (
-                <button
-                  onClick={() => updateParam('fabric', 'all')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-stone-200 text-stone-800 rounded-full text-xs hover:bg-stone-300 transition-colors"
-                >
-                  Fabric: {currentFabric}
-                  <X className="w-3 h-3" />
-                </button>
-              )}
-
-              {currentColor !== 'all' && (
-                <button
-                  onClick={() => updateParam('color', 'all')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-stone-200 text-stone-800 rounded-full text-xs hover:bg-stone-300 transition-colors"
-                >
-                  Color: {currentColor}
-                  <X className="w-3 h-3" />
-                </button>
-              )}
-
-              {currentSize !== 'all' && (
-                <button
-                  onClick={() => updateParam('size', 'all')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-stone-200 text-stone-800 rounded-full text-xs hover:bg-stone-300 transition-colors"
-                >
-                  Size: {currentSize}
-                  <X className="w-3 h-3" />
-                </button>
-              )}
-
-              {currentInStock !== 'all' && (
-                <button
-                  onClick={() => updateParam('inStock', 'all')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-stone-200 text-stone-800 rounded-full text-xs hover:bg-stone-300 transition-colors"
-                >
-                  Stock: {currentInStock === 'true' ? 'In Stock' : 'Out of Stock'}
-                  <X className="w-3 h-3" />
-                </button>
-              )}
-
-              {currentSearch && (
-                <button
-                  onClick={() => updateParam('search', '')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-stone-200 text-stone-800 rounded-full text-xs hover:bg-stone-300 transition-colors"
-                >
-                  Search: "{currentSearch}"
-                  <X className="w-3 h-3" />
-                </button>
-              )}
-
-              <button
-                onClick={clearAllFilters}
-                className="inline-flex items-center gap-1 text-xs font-bold text-[#F5B016] hover:underline ml-2"
-              >
-                <RotateCcw className="w-3 h-3" />
-                Clear All
-              </button>
-            </div>
-          )}
         </div>
 
-        {/* Layout: Sidebar Filter (Desktop) + Product Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Desktop Filter Sidebar */}
-          <aside className="hidden lg:block lg:col-span-1 space-y-8 bg-white p-6 rounded-lg border border-stone-200 shadow-xs h-fit sticky top-24">
-            <div className="flex items-center justify-between pb-4 border-b border-stone-200">
-              <h3 className="font-display text-lg font-bold text-stone-900 tracking-wide">
-                FILTERS
-              </h3>
-              {hasActiveFilters && (
-                <button
-                  onClick={clearAllFilters}
-                  className="text-xs text-[#F5B016] hover:text-black font-semibold"
-                >
-                  Clear All
-                </button>
-              )}
-            </div>
-
-            {/* Category Filter */}
-            <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900 mb-3">
-                Category
-              </h4>
-              <ul className="space-y-2 text-xs">
-                {categoriesList.map((cat) => (
-                  <li key={cat.value}>
-                    <button
-                      onClick={() => updateParam('category', cat.value)}
-                      className={`flex items-center justify-between w-full text-left transition-colors ${
-                        currentCategory === cat.value
-                          ? 'font-bold text-black'
-                          : 'text-stone-600 hover:text-black'
-                      }`}
-                    >
-                      <span>{cat.label}</span>
-                      {currentCategory === cat.value && <Check className="w-3.5 h-3.5 text-[#F5B016]" />}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Fabric Filter */}
-            <div className="pt-6 border-t border-stone-200">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900 mb-3">
-                Fabric
-              </h4>
-              <ul className="space-y-2 text-xs">
-                <li key="all-fabrics">
+        {/* Main Layout: Left Sidebar Filters + Product Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Desktop Left Sidebar Filters (ukfashions.pk style) */}
+          <aside className="hidden lg:block lg:col-span-3">
+            <div className="sticky top-28 bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
+              <div className="flex items-center justify-between pb-4 mb-4 border-b border-stone-200">
+                <span className="font-heading font-extrabold text-base text-[#14213D] uppercase tracking-wider flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-[#F2B705]" />
+                  Filter By
+                </span>
+                {hasActiveFilters && (
                   <button
-                    onClick={() => updateParam('fabric', 'all')}
-                    className={`flex items-center justify-between w-full text-left transition-colors ${
-                      currentFabric === 'all' ? 'font-bold text-black' : 'text-stone-600 hover:text-black'
-                    }`}
+                    onClick={clearAllFilters}
+                    className="text-xs text-[#C1272D] font-bold hover:underline"
                   >
-                    <span>All Fabrics</span>
-                    {currentFabric === 'all' && <Check className="w-3.5 h-3.5 text-[#F5B016]" />}
-                  </button>
-                </li>
-                {fabricsList.map((fab) => (
-                  <li key={fab}>
-                    <button
-                      onClick={() => updateParam('fabric', fab)}
-                      className={`flex items-center justify-between w-full text-left transition-colors ${
-                        currentFabric.toLowerCase() === fab.toLowerCase()
-                          ? 'font-bold text-black'
-                          : 'text-stone-600 hover:text-black'
-                      }`}
-                    >
-                      <span>{fab}</span>
-                      {currentFabric.toLowerCase() === fab.toLowerCase() && (
-                        <Check className="w-3.5 h-3.5 text-[#F5B016]" />
-                      )}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Size Filter */}
-            <div className="pt-6 border-t border-stone-200">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900 mb-3">
-                Size
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => updateParam('size', 'all')}
-                  className={`px-3 py-1.5 text-xs rounded border transition-colors ${
-                    currentSize === 'all'
-                      ? 'bg-black text-white border-black font-semibold'
-                      : 'bg-white text-stone-700 border-stone-300 hover:border-black'
-                  }`}
-                >
-                  All
-                </button>
-                {sizesList.map((sz) => (
-                  <button
-                    key={sz}
-                    onClick={() => updateParam('size', sz)}
-                    className={`px-3 py-1.5 text-xs rounded border transition-colors ${
-                      currentSize.toUpperCase() === sz.toUpperCase()
-                        ? 'bg-black text-white border-black font-semibold'
-                        : 'bg-white text-stone-700 border-stone-300 hover:border-black'
-                    }`}
-                  >
-                    {sz}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Availability / Stock */}
-            <div className="pt-6 border-t border-stone-200">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900 mb-3">
-                Availability
-              </h4>
-              <ul className="space-y-2 text-xs">
-                <li>
-                  <button
-                    onClick={() => updateParam('inStock', 'all')}
-                    className={`flex items-center justify-between w-full text-left ${
-                      currentInStock === 'all' ? 'font-bold text-black' : 'text-stone-600'
-                    }`}
-                  >
-                    <span>All Products</span>
-                    {currentInStock === 'all' && <Check className="w-3.5 h-3.5 text-[#F5B016]" />}
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => updateParam('inStock', 'true')}
-                    className={`flex items-center justify-between w-full text-left ${
-                      currentInStock === 'true' ? 'font-bold text-black' : 'text-stone-600'
-                    }`}
-                  >
-                    <span>In Stock</span>
-                    {currentInStock === 'true' && <Check className="w-3.5 h-3.5 text-[#F5B016]" />}
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => updateParam('inStock', 'false')}
-                    className={`flex items-center justify-between w-full text-left ${
-                      currentInStock === 'false' ? 'font-bold text-black' : 'text-stone-600'
-                    }`}
-                  >
-                    <span>Out of Stock</span>
-                    {currentInStock === 'false' && <Check className="w-3.5 h-3.5 text-[#F5B016]" />}
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            {/* Price Filter */}
-            <div className="pt-6 border-t border-stone-200">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900 mb-3">
-                Price (PKR)
-              </h4>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs">
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    value={currentMinPrice}
-                    onChange={(e) => updateParam('minPrice', e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-300 rounded px-2.5 py-1.5 focus:outline-none focus:border-stone-500"
-                  />
-                  <span className="text-stone-400">-</span>
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    value={currentMaxPrice}
-                    onChange={(e) => updateParam('maxPrice', e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-300 rounded px-2.5 py-1.5 focus:outline-none focus:border-stone-500"
-                  />
-                </div>
-                {(currentMinPrice || currentMaxPrice) && (
-                  <button
-                    onClick={() => {
-                      const next = new URLSearchParams(searchParams);
-                      next.delete('minPrice');
-                      next.delete('maxPrice');
-                      setSearchParams(next);
-                    }}
-                    className="text-[11px] text-[#F5B016] hover:underline"
-                  >
-                    Reset Price
+                    Clear all
                   </button>
                 )}
               </div>
+              {renderFiltersSidebar()}
             </div>
           </aside>
 
-          {/* Product Grid Area (3 or 4 per row depending on viewport) */}
-          <main className="lg:col-span-3">
+          {/* Product Grid Area */}
+          <main className="lg:col-span-9">
             {isLoading ? (
-              <div className="h-96 flex flex-col items-center justify-center text-stone-400 space-y-3">
-                <Loader2 className="w-8 h-8 animate-spin text-[#F5B016]" />
-                <span className="text-xs tracking-wider uppercase font-semibold">Loading Collection...</span>
+              <div className="min-h-[400px] flex flex-col items-center justify-center py-24">
+                <Loader2 className="w-10 h-10 animate-spin text-[#F2B705] mb-3" />
+                <span className="text-sm font-bold text-[#14213D] font-heading">
+                  Loading Hand-Made Balochi Catalog...
+                </span>
               </div>
             ) : products.length === 0 ? (
-              <div className="bg-white rounded-lg border border-stone-200 p-12 text-center space-y-4">
-                <div className="w-16 h-16 mx-auto rounded-full bg-stone-100 flex items-center justify-center text-stone-400">
-                  <Filter className="w-8 h-8" />
-                </div>
-                <h3 className="font-display text-xl font-bold text-stone-900">
-                  No products found
+              <div className="bg-white rounded-2xl p-12 text-center border border-stone-200 shadow-sm">
+                <SlidersHorizontal className="w-12 h-12 text-[#F2B705] mx-auto mb-3" />
+                <h3 className="font-heading text-lg font-bold text-[#14213D] mb-1">
+                  No matching garments found
                 </h3>
-                <p className="text-xs text-stone-500 max-w-md mx-auto">
-                  We could not find any products matching your selected filter criteria. Try clearing some filters or searching for other fabrics.
+                <p className="text-xs text-stone-500 max-w-md mx-auto mb-6">
+                  We could not find any items matching your selected filter criteria. Try clearing some filters or searching for another fabric.
                 </p>
                 <button
                   onClick={clearAllFilters}
-                  className="px-6 py-2.5 bg-stone-900 text-white rounded text-xs font-semibold uppercase tracking-wider hover:bg-black transition-colors"
+                  className="px-6 py-2.5 bg-[#F2B705] hover:bg-[#D9A404] text-[#14213D] font-extrabold text-xs tracking-wider uppercase rounded-lg shadow-md transition-all font-heading"
                 >
-                  Clear All Filters
+                  Reset All Filters
                 </button>
               </div>
             ) : (
-              <div>
-                {/* 4 products per row large desktop, 3 tablet, 2 mobile */}
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                   {products.map((product) => (
                     <ProductCard
                       key={product.id}
@@ -523,154 +547,79 @@ export const ShopPage: React.FC = () => {
 
                 {/* Pagination Controls */}
                 {pagination.totalPages > 1 && (
-                  <div className="mt-12 flex items-center justify-center gap-2 pt-6 border-t border-stone-200">
+                  <div className="mt-12 flex items-center justify-center gap-2 font-heading">
                     <button
-                      onClick={() => updateParam('page', String(currentPage - 1))}
                       disabled={!pagination.hasPrevPage}
-                      className="px-4 py-2 rounded border border-stone-300 text-xs font-semibold text-stone-700 bg-white hover:bg-stone-50 disabled:opacity-40 transition-colors"
+                      onClick={() => updateParam('page', String(currentPage - 1))}
+                      className="px-4 py-2 rounded-lg bg-white border border-stone-300 text-xs font-bold text-[#14213D] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-100 shadow-sm"
                     >
                       Previous
                     </button>
-
                     {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pNum) => (
                       <button
                         key={pNum}
                         onClick={() => updateParam('page', String(pNum))}
-                        className={`w-9 h-9 rounded text-xs font-bold transition-colors ${
-                          pNum === currentPage
-                            ? 'bg-stone-900 text-white shadow-xs'
-                            : 'bg-white border border-stone-300 text-stone-700 hover:bg-stone-50'
+                        className={`w-9 h-9 rounded-lg text-xs font-bold transition-all shadow-sm ${
+                          currentPage === pNum
+                            ? 'bg-[#14213D] text-[#F2B705]'
+                            : 'bg-white text-[#14213D] border border-stone-300 hover:bg-stone-100'
                         }`}
                       >
                         {pNum}
                       </button>
                     ))}
-
                     <button
-                      onClick={() => updateParam('page', String(currentPage + 1))}
                       disabled={!pagination.hasNextPage}
-                      className="px-4 py-2 rounded border border-stone-300 text-xs font-semibold text-stone-700 bg-white hover:bg-stone-50 disabled:opacity-40 transition-colors"
+                      onClick={() => updateParam('page', String(currentPage + 1))}
+                      className="px-4 py-2 rounded-lg bg-white border border-stone-300 text-xs font-bold text-[#14213D] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-100 shadow-sm"
                     >
                       Next
                     </button>
                   </div>
                 )}
-              </div>
+              </>
             )}
           </main>
         </div>
       </div>
 
-      {/* Mobile Filter Drawer */}
+      {/* Mobile Filters Slide-over Modal */}
       {isMobileFilterOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setIsMobileFilterOpen(false)}
           />
-          <div className="relative w-4/5 max-w-sm bg-white h-full shadow-2xl flex flex-col z-10 p-6 overflow-y-auto">
+          <div className="relative w-4/5 max-w-sm ml-auto bg-white h-full shadow-2xl flex flex-col z-10 p-6 overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-stone-200">
-              <h3 className="font-display text-lg font-bold text-stone-900">
-                FILTERS
-              </h3>
+              <span className="font-heading font-extrabold text-base text-[#14213D]">
+                Filters
+              </span>
               <button
                 onClick={() => setIsMobileFilterOpen(false)}
-                className="p-1 text-stone-500 hover:text-black"
+                className="p-1.5 text-stone-600 hover:text-black"
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6" />
               </button>
             </div>
-
-            <div className="py-4 space-y-6 flex-1">
-              {/* Category */}
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900 mb-2">
-                  Category
-                </h4>
-                <div className="flex flex-col space-y-2 text-xs">
-                  {categoriesList.map((cat) => (
-                    <button
-                      key={cat.value}
-                      onClick={() => {
-                        updateParam('category', cat.value);
-                        setIsMobileFilterOpen(false);
-                      }}
-                      className={`text-left py-1 ${
-                        currentCategory === cat.value ? 'font-bold text-black' : 'text-stone-600'
-                      }`}
-                    >
-                      {cat.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Fabric */}
-              <div className="pt-4 border-t border-stone-100">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900 mb-2">
-                  Fabric
-                </h4>
-                <div className="flex flex-wrap gap-2 text-xs">
-                  {fabricsList.map((f) => (
-                    <button
-                      key={f}
-                      onClick={() => {
-                        updateParam('fabric', f);
-                        setIsMobileFilterOpen(false);
-                      }}
-                      className={`px-3 py-1 rounded border ${
-                        currentFabric.toLowerCase() === f.toLowerCase()
-                          ? 'bg-black text-white font-bold'
-                          : 'bg-white text-stone-700 border-stone-300'
-                      }`}
-                    >
-                      {f}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Size */}
-              <div className="pt-4 border-t border-stone-100">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900 mb-2">
-                  Size
-                </h4>
-                <div className="flex flex-wrap gap-2 text-xs">
-                  {sizesList.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => {
-                        updateParam('size', s);
-                        setIsMobileFilterOpen(false);
-                      }}
-                      className={`px-3 py-1 rounded border ${
-                        currentSize.toUpperCase() === s.toUpperCase()
-                          ? 'bg-black text-white font-bold'
-                          : 'bg-white text-stone-700 border-stone-300'
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            <div className="py-4">
+              {renderFiltersSidebar()}
             </div>
-
-            <div className="pt-4 border-t border-stone-200 flex gap-2">
+            <div className="mt-auto pt-4 border-t border-stone-200 flex gap-2">
               <button
                 onClick={() => {
                   clearAllFilters();
                   setIsMobileFilterOpen(false);
                 }}
-                className="w-1/2 py-2.5 border border-stone-300 text-xs font-semibold rounded text-stone-800"
+                className="w-1/2 py-2.5 bg-stone-100 text-stone-700 font-bold text-xs rounded-lg uppercase font-heading"
               >
-                Clear All
+                Reset
               </button>
               <button
                 onClick={() => setIsMobileFilterOpen(false)}
-                className="w-1/2 py-2.5 bg-black text-white text-xs font-semibold rounded"
+                className="w-1/2 py-2.5 bg-[#F2B705] text-[#14213D] font-black text-xs rounded-lg uppercase font-heading shadow-md"
               >
-                Apply Filters
+                Apply
               </button>
             </div>
           </div>
@@ -685,4 +634,3 @@ export const ShopPage: React.FC = () => {
     </div>
   );
 };
-

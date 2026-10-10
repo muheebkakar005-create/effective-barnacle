@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -59,7 +59,7 @@ export const AdminLayout: React.FC = () => {
         {/* Brand Header */}
         <div className="p-5 border-b border-stone-800 flex items-center justify-between">
           <Link to="/admin" className="block group">
-            <SKBrandLogo size="md" light={true} showText={true} />
+            <SKBrandLogo size="md" light={true} showTagline={true} />
           </Link>
         </div>
 

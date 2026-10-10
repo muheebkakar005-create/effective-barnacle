@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Lock, Mail, ArrowRight, Loader2, Sparkles, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
@@ -52,7 +52,7 @@ export const LoginPage: React.FC = () => {
       <div className="w-full max-w-md bg-white rounded-xl border border-stone-200 p-8 shadow-sm">
         <div className="text-center space-y-2 mb-8">
           <div className="flex justify-center mb-1">
-            <SKBrandLogo size="md" showText={true} />
+            <SKBrandLogo size="md" showTagline={true} />
           </div>
           <h1 className="font-display text-xl text-stone-800 pt-1">
             Welcome to Your Account

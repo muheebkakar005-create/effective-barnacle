@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import {
@@ -101,7 +101,7 @@ export const OrderConfirmationPage: React.FC = () => {
         {/* Success Banner */}
         <div className="bg-white rounded-xl border border-stone-200 p-6 sm:p-10 shadow-sm text-center space-y-4">
           <div className="flex justify-center mb-1">
-            <SKBrandLogo size="md" showText={true} />
+            <SKBrandLogo size="md" showTagline={true} />
           </div>
 
           <div className="w-16 h-16 mx-auto rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 mt-2">

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   Heart,
@@ -359,12 +359,12 @@ export const ProductDetailPage: React.FC = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="space-y-3 pt-6 border-t border-stone-200">
+            <div className="space-y-3 pt-6 border-t border-stone-200 font-heading">
               <div className="flex gap-3">
                 <button
                   onClick={handleAddToCart}
                   disabled={product.stock <= 0}
-                  className="flex-1 py-3.5 bg-stone-900 hover:bg-black text-white font-semibold text-xs tracking-widest uppercase rounded flex items-center justify-center gap-2 transition-all shadow disabled:opacity-50"
+                  className="flex-1 py-3.5 bg-[#F2B705] hover:bg-[#D9A404] text-[#14213D] font-extrabold text-xs tracking-widest uppercase rounded-xl flex items-center justify-center gap-2 transition-all shadow-md disabled:opacity-50"
                 >
                   <ShoppingBag className="w-4 h-4" />
                   {product.stock > 0 ? 'Add to Bag' : 'Out of Stock'}
@@ -375,23 +375,23 @@ export const ProductDetailPage: React.FC = () => {
                     toggleWishlist(product);
                     showToast(isWishlisted ? 'Removed from wishlist' : 'Saved to wishlist');
                   }}
-                  className={`p-3.5 rounded border transition-colors ${
+                  className={`p-3.5 rounded-xl border transition-colors ${
                     isWishlisted
-                      ? 'bg-rose-50 border-rose-300 text-rose-600'
-                      : 'bg-white border-stone-300 text-stone-700 hover:border-black'
+                      ? 'bg-rose-50 border-[#C1272D] text-[#C1272D]'
+                      : 'bg-white border-stone-300 text-[#14213D] hover:border-[#14213D]'
                   }`}
                   aria-label="Wishlist"
                 >
-                  <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-rose-600' : ''}`} />
+                  <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-[#C1272D]' : ''}`} />
                 </button>
               </div>
 
               {product.stock > 0 && (
                 <button
                   onClick={handleBuyNow}
-                  className="w-full py-3.5 bg-[#F5B016] hover:bg-[#E5A00D] text-black font-semibold text-xs tracking-widest uppercase rounded transition-colors shadow"
+                  className="w-full py-3.5 bg-[#14213D] hover:bg-[#1D3557] text-white font-extrabold text-xs tracking-widest uppercase rounded-xl transition-all shadow-md"
                 >
-                  Buy Now
+                  Buy It Now
                 </button>
               )}
 
@@ -407,21 +407,21 @@ export const ProductDetailPage: React.FC = () => {
                 })}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-3 bg-[#25D366] hover:bg-[#20ba59] text-black font-semibold text-xs rounded flex items-center justify-center gap-2 transition-colors shadow-xs"
+                className="w-full py-3.5 bg-[#25D366] hover:bg-[#1EBE5D] text-black font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 transition-all shadow-md uppercase tracking-wider"
               >
                 <MessageCircle className="w-4 h-4 fill-black" />
-                Order via WhatsApp Concierge
+                Order on WhatsApp
               </a>
 
-              {/* Guarantees */}
-              <div className="pt-2 grid grid-cols-2 gap-2 text-[11px] text-stone-500">
-                <div className="flex items-center gap-1.5">
-                  <Truck className="w-3.5 h-3.5 text-[#F5B016]" />
-                  <span>Express Courier Dispatch</span>
+              {/* Guarantees & DHL Shipping Note */}
+              <div className="pt-3 grid grid-cols-2 gap-2 text-xs text-stone-600 font-body">
+                <div className="flex items-center gap-1.5 font-semibold">
+                  <Truck className="w-4 h-4 text-[#F2B705]" />
+                  <span>DHL Worldwide Express</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#F5B016]" />
-                  <span>100% Genuine Pakistani Fabric</span>
+                <div className="flex items-center gap-1.5 font-semibold">
+                  <ShieldCheck className="w-4 h-4 text-[#F2B705]" />
+                  <span>100% Genuine Hand-Made Doch</span>
                 </div>
               </div>
             </div>

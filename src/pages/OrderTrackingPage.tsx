@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Search, Package, CheckCircle2, Clock, Truck, ShieldCheck, AlertCircle, Loader2 } from 'lucide-react';
 import { Order } from '../types/index.ts';
 import { api } from '../services/api.ts';
@@ -62,7 +62,7 @@ export const OrderTrackingPage: React.FC = () => {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto mb-10">
           <div className="flex justify-center mb-2">
-            <SKBrandLogo size="md" showText={true} />
+            <SKBrandLogo size="md" showTagline={true} />
           </div>
           <span className="text-xs font-semibold tracking-[0.25em] text-[#F5B016] uppercase block mb-1">
             Dispatch & Delivery â€¢ Liaqat Bazaar Quetta

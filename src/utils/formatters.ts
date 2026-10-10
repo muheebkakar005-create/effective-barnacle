@@ -49,6 +49,16 @@ export function generateWhatsAppOrderUrl(params: {
   return `https://wa.me/${cleanNumber}?text=${encodedMessage}`;
 }
 
+export function generateProductWhatsAppUrl(product: { name: string; sku?: string; price: number; salePrice?: number }, size?: string, color?: string): string {
+  return generateWhatsAppOrderUrl({
+    productName: product.name,
+    sku: product.sku,
+    price: product.salePrice || product.price,
+    size,
+    color,
+  });
+}
+
 export function generateGeneralWhatsAppUrl(phone = '+923160367456', message = 'Hello SK Brand Sami Khan! I have an inquiry about your handmade Balochi dresses and pret collection.'): string {
   const targetNumber = phone.replace(/[^\d+]/g, '');
   const cleanNumber = targetNumber.startsWith('+') ? targetNumber.slice(1) : targetNumber;
